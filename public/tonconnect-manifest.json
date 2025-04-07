@@ -1,0 +1,9 @@
+{
+  "url": "https://5650-2405-201-1014-3120-39c9-7ac7-6097-eb6e.ngrok-free.app",
+  "name": "TON Swap MiniApp",
+  "iconUrl": "https://5650-2405-201-1014-3120-39c9-7ac7-6097-eb6e.ngrok-free.app/icon.png",
+  "termsOfUseUrl": "https://5650-2405-201-1014-3120-39c9-7ac7-6097-eb6e.ngrok-free.app/terms",
+  "privacyPolicyUrl": "https://5650-2405-201-1014-3120-39c9-7ac7-6097-eb6e.ngrok-free.app/privacy",
+  "manifestVersion": "1.0",
+  "bridgeUrl": "https://bridge.tonapi.io/bridge"
+}
