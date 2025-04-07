@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   useTonConnectUI,
   TonConnectButton,
@@ -8,23 +8,11 @@ import {
 import "./App.css";
 
 function App() {
-  const [loading, setLoading] = useState(true);
   const wallet = useTonWallet();
-   const userFriendlyAddress = useTonAddress();
-  const [connected, setConnected] = useState(false);
+  const userFriendlyAddress = useTonAddress();
   const [logs, setLogs] = useState("");
   const [tonConnectUI] = useTonConnectUI();
-  useEffect(() => {
-    const loadTonConnect = async () => {
-      setLoading(false);
-      if (wallet.account.addresss) {
-        setLoading(false);
-        setConnected(true);
-      }
-    };
-
-    loadTonConnect();
-  }, [wallet]);
+  console.log("wallet", wallet, userFriendlyAddress);
 
   const testSwap = async () => {
     if (!tonConnectUI) return;
@@ -50,10 +38,9 @@ function App() {
         Swap your tokens instantly on TON powered by Chimpx.ai
       </p>
 
-      {loading && <p>Loading Wallet...</p>}
       <TonConnectButton />
 
-      {connected && (
+      {userFriendlyAddress && (
         <>
           <p className="mb-4">Wallet Connected!</p>
           <button
