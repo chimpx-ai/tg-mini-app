@@ -1,29 +1,30 @@
 import { useEffect, useState } from "react";
-import { useTonConnectUI, TonConnectButton } from "@tonconnect/ui-react";
+import {
+  useTonConnectUI,
+  TonConnectButton,
+  useTonWallet,
+  useTonAddress,
+} from "@tonconnect/ui-react";
 import "./App.css";
 
 function App() {
   const [loading, setLoading] = useState(true);
+  const wallet = useTonWallet();
+   const userFriendlyAddress = useTonAddress();
   const [connected, setConnected] = useState(false);
   const [logs, setLogs] = useState("");
   const [tonConnectUI] = useTonConnectUI();
   useEffect(() => {
     const loadTonConnect = async () => {
-      tonConnectUI.openModal();
       setLoading(false);
-      tonConnectUI.connectionRestored.then((wallet) => {
-        if (wallet) setConnected(true);
-      });
+      if (wallet.account.addresss) {
+        setLoading(false);
+        setConnected(true);
+      }
     };
 
     loadTonConnect();
-  }, [tonConnectUI]);
-
-  const connectWallet = async () => {
-    if (!tonConnectUI) return;
-    const wallet = await tonConnectUI.connectWallet();
-    if (wallet) setConnected(true);
-  };
+  }, [wallet]);
 
   const testSwap = async () => {
     if (!tonConnectUI) return;
@@ -32,7 +33,7 @@ function App() {
         validUntil: Math.floor(Date.now() / 1000) + 600,
         messages: [
           {
-            address: tonConnectUI.wallet.account.address,
+            address: userFriendlyAddress,
             amount: "1000000",
           },
         ],
@@ -51,14 +52,6 @@ function App() {
 
       {loading && <p>Loading Wallet...</p>}
       <TonConnectButton />
-      {!loading && !connected && (
-        <button
-          onClick={connectWallet}
-          className="bg-[#1d8147] text-white py-2 px-4 rounded-xl"
-        >
-          Connect Wallet
-        </button>
-      )}
 
       {connected && (
         <>
