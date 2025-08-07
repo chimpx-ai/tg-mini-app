@@ -5,16 +5,26 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:ngrok": "concurrently \"vite\" \"ngrok http 3001\"",
     "build": "vite build",
     "tailwind": "tailwind dev",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "ngrok": "ngrok http 3001"
   },
   "dependencies": {
+    "@ston-fi/api": "^0.24.0",
+    "@ston-fi/sdk": "^2.5.0",
     "@tailwindcss/vite": "^4.1.3",
+    "@ton/core": "^0.61.0",
+    "@ton/crypto": "^3.3.0",
+    "@ton/ton": "^15.3.1",
     "@tonconnect/ui-react": "^2.1.0",
+    "buffer": "^6.0.3",
+    "lucide-react": "^0.536.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^6.28.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
@@ -22,10 +32,12 @@
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.21",
+    "concurrently": "^8.2.2",
     "eslint": "^9.21.0",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
+    "ngrok": "^5.0.0-beta.2",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.1.3",
     "vite": "^6.2.0"
