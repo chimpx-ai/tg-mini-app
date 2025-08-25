@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTonAddress } from "@tonconnect/ui-react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
@@ -91,9 +92,63 @@ const testQuote = {
 };
 function Home() {
   const userFriendlyAddress = useTonAddress();
+  const navigate = useNavigate();
   // const [logs, setLogs] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([
+    {
+      id: 1,
+      text: "Hi, I am Chatbot. Hi, I am ChatbotHi, I am ChatbotHi, I am ChatbotHi, I am ChatbotHi, I am Chatbot. Hi, I am ChatbotHi, I am Chatbot.",
+      sender: "bot",
+      timestamp: "10:30 AM",
+    },
+    {
+      id: 2,
+      text: "Hi, I want to Trade $1 USD .",
+      sender: "user",
+      timestamp: "10:31 AM",
+    },
+    {
+      id: 3,
+      text: "Swap",
+      sender: "bot",
+      transaction: testQuote,
+      actionType: 'swap',
+      timestamp: "10:32 AM",
+    },
+    {
+      id: 1,
+      text: "Hi, I am Chatbot. Hi, I am ChatbotHi, I am ChatbotHi, I am ChatbotHi, I am ChatbotHi, I am Chatbot. Hi, I am ChatbotHi, I am Chatbot.",
+      sender: "bot",
+      timestamp: "10:30 AM",
+    },
+    {
+      id: 2,
+      text: "Hi, I want to Trade $1 USD .",
+      sender: "user",
+      timestamp: "10:31 AM",
+    },
+    {
+      id: 3,
+      text: "Swap",
+      sender: "bot",
+      transaction: testQuote,
+      actionType: 'swap',
+      timestamp: "10:32 AM",
+    },
+    // {
+    //   id: 4,
+    //   text: "That looks good! Can you also show me the current TON price?",
+    //   sender: "user",
+    //   timestamp: "10:32 AM",
+    // },
+    // {
+    //   id: 5,
+    //   text: "The current TON price is $3.56 USD. The market is looking stable today.",
+    //   sender: "bot",
+    //   timestamp: "10:33 AM",
+    // }
+  ]);
   const [inputText, setInputText] = useState("");
   // const { processMessage, isLoading } = useActionHandler();
 
@@ -159,8 +214,14 @@ function Home() {
     }
   };
 
+  useEffect(() => {
+    if (!userFriendlyAddress) {
+      navigate("/landing");
+    }
+  }, [userFriendlyAddress, navigate]);
+
   return (
-    <div className="h-screen flex flex-col text-white">
+    <div className="relative size-full h-screen flex flex-col text-white bg-gradient-radial from-[rgba(25,77,40,1)] via-[rgba(23,57,33,1)] to-[rgba(22,36,26,1)]">
       <Header />
 
       {/* Chat Area - Only show when wallet is connected */}
@@ -174,6 +235,15 @@ function Home() {
             onSendMessage={sendMessage}
           />
         </>
+      )}
+
+      {/* Connect Wallet State */}
+      {!userFriendlyAddress && (
+        <div className="flex-1 flex items-center justify-center text-center p-4">
+          <div className="space-y-4">
+            <p className="text-gray-400 text-sm">Connect your wallet to start trading</p>
+          </div>
+        </div>
       )}
     </div>
   );
