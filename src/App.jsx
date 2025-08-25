@@ -7,7 +7,7 @@ function App() {
     <div className="App min-h-screen">
       <div className="w-full max-w-sm mx-auto h-screen">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Landing />} />
           <Route path="/home" element={<Home />} />
           <Route path="/landing" element={<Landing />} />
           {/* Add more routes here as needed */}

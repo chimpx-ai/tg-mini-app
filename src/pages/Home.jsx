@@ -216,7 +216,7 @@ function Home() {
 
   useEffect(() => {
     if (!userFriendlyAddress) {
-      navigate("/landing");
+      navigate("/");
     }
   }, [userFriendlyAddress, navigate]);
 
