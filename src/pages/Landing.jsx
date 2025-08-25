@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTonAddress } from '@tonconnect/ui-react';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import bgImage from '../assets/bgimage.png'
 import ChimpXLogo from '../assets/ChimpX-white-logo.svg';
-import ChimpXFull from '../assets/ChimpX-full.svg';
+import ChimpXFull from '../assets/chimpx-full.svg';
 import Asset1 from '../assets/1.svg';
 import Asset2 from '../assets/2.svg';
 import Asset3 from '../assets/3.svg';
