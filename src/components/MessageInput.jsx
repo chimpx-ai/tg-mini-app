@@ -15,7 +15,7 @@ const MessageInput = ({
   };
 
   return (
-    <div className="py-4 flex-shrink-0 w-full">
+    <div className="py-4 flex-shrink-0 mx-4">
       <div className="relative flex items-center gap-2">
         {/* Message Input Field */}
         <div className="relative flex-1">
@@ -25,7 +25,7 @@ const MessageInput = ({
             onChange={(e) => setInputText(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Write a Messege..."
-            className="w-full h-12 bg-black/45 text-white px-6 py-2 rounded-full border-none outline-none font-normal font-['Inter'] placeholder-[#8D8D8D] focus:outline-none"
+            className="w-full h-12 bg-black/45 text-white px-6 py-2 rounded-full border-none outline-none font-normal font-['Inter:Medium',_sans-serif] placeholder-[#8D8D8D] focus:outline-none"
             disabled={isLoading}
           />
         </div>

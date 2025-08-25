@@ -27,68 +27,63 @@ const Landing = () => {
 
   return (
     <div className="w-full h-screen relative overflow-hidden">
-      {/* Main container with exact Figma dimensions */}
+      
       <motion.div 
         className="absolute w-full h-full"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
         style={{
-          background: 'radial-gradient(106.41% 65.63% at 50% 109.14%, #194D28 0%, #16241A 100%)',
-          left: '50%',
-          top: '50%',
-          transform: 'translate(-50%, -50%)'
+          backgroundImage: `
+            radial-gradient(
+              106.41% 65.63% at 50% 109.14%, 
+              rgba(25, 77, 40, 0.4) 0%,   
+              rgba(22, 36, 26, 0.5) 100%
+            ),
+            url(${bgImage})
+          `,
+          backgroundSize: 'cover, cover',
+          backgroundRepeat: 'no-repeat, no-repeat',
+          backgroundPosition: 'center, center',
+          margin: 0,
+          padding: 0,
+          backgroundAttachment: 'fixed, fixed'
         }}
       >
-        {/* Background pattern */}
-        <motion.img 
-          src={bgImage} 
-          alt="Background pattern"
-          className="absolute"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 0.5, scale: 1 }}
-          transition={{ duration: 1.2, delay: 0.3 }}
-          style={{
-            width: '713px',
-            height: '396px',
-            left: '100px',
-            top: '150px',
-            scale: '2',
-            opacity: 0.5
-          }}
-        />
 
         {/* ChimpX Logo */}
         <motion.img 
           src={ChimpXLogo} 
           alt="ChimpX Logo" 
-          className="absolute w-56 h-56"
+          className="absolute"
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
           style={{
-            left: '83px',
+            width: '180px',
+            height: '180px',
+            left: 'calc(50% - 90px)',
             top: '-40px',
-            display: 'inline-flex',
-            alignItems: 'center'
+            zIndex: 10
           }}
         />
 
         {/* Trade & Control 100% DeFi text */}
         <motion.div 
-          className="absolute text-white font-bold w-full"
+          className="absolute text-white font-bold text-center"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
           style={{
-            left: '10px',
-            top: '118px',
+            left: 'calc(50% - 160px)',
+            top: '80px',
+            width: '320px',
             color: '#FFF',
             fontFamily: 'Inter, -apple-system, Roboto, Helvetica, sans-serif',
             fontSize: '24px',
             fontWeight: '700',
-            lineHeight: '40.103px'
-
+            lineHeight: '40.103px',
+            zIndex: 10
           }}
         >
           Trade & Control 100% DeFi
@@ -98,22 +93,45 @@ const Landing = () => {
         <motion.img 
           src={ChimpXFull} 
           alt="ChimpX mascot" 
-          className="absolute min-w-96 h-96"
+          className="absolute"
           initial={{ opacity: 0, scale: 0.8, y: 50 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.6 }}
           style={{
+            width: '280px',
+            height: 'auto',
             aspectRatio: '73/98',
-            left: '0px',
-            top: '300px'
+            left: 'calc(50% - 140px)',
+            top: '30%',
+            zIndex: 10
           }}
         />
+
+        {/* Connect Wallet Button */}
+        <motion.div 
+          className="absolute"
+          initial={{ opacity: 0, y: 30, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.8, delay: 1.8 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          style={{
+            left: 'calc(50% - 86.5px)',
+            // top: '600px',
+            bottom: '10%',
+            width: '173px',
+            height: '39px',
+            zIndex: 10
+          }}
+        >
+          <TonConnectButton className="w-full h-full bg-[#0098E9] border-none rounded-full text-white text-base font-semibold font-inter flex items-center justify-center whitespace-nowrap overflow-hidden text-ellipsis" />
+        </motion.div>
 
         {/* Crypto icon 1 - Top right */}
         <motion.img 
           src={Asset1} 
           alt="Crypto icon" 
-          className="absolute w-32 h-32"
+          className="absolute"
           initial={{ opacity: 0, x: 50, y: -50 }}
           animate={{ 
             opacity: 1, 
@@ -130,9 +148,12 @@ const Landing = () => {
             }
           }}
           style={{
+            width: '128px',
+            height: '128px',
             filter: 'drop-shadow(0 44px 22.4px rgba(0, 0, 0, 0.25))',
-            left: '240px',
-            top: '284px'
+            left: 'calc(50% + 80px)',
+            top: '30%',
+            zIndex: 5
           }}
         />
 
@@ -140,7 +161,7 @@ const Landing = () => {
         <motion.img 
           src={Asset2} 
           alt="Crypto icon" 
-          className="absolute w-30 h-30"
+          className="absolute"
           initial={{ opacity: 0, x: -50, y: 50 }}
           animate={{ 
             opacity: 1, 
@@ -157,9 +178,12 @@ const Landing = () => {
             }
           }}
           style={{
+            width: '120px',
+            height: '120px',
             filter: 'drop-shadow(0 44px 22.4px rgba(0, 0, 0, 0.25))',
-            left: '-10px',
-            top: '480px'
+            left: 'calc(50% - 200px)',
+            top: '65%',
+            zIndex: 5
           }}
         />
 
@@ -167,7 +191,7 @@ const Landing = () => {
         <motion.img 
           src={Asset3} 
           alt="Crypto icon" 
-          className="absolute w-32 h-32"
+          className="absolute"
           initial={{ opacity: 0, x: -30, y: -30 }}
           animate={{ 
             opacity: 1, 
@@ -184,9 +208,12 @@ const Landing = () => {
             }
           }}
           style={{
+            width: '128px',
+            height: '128px',
             filter: 'drop-shadow(0 44px 22.4px rgba(0, 0, 0, 0.25))',
-            left: '160px',
-            top: '205px'
+            left: 'calc(50% - 40px)',
+            top: '25%',
+            zIndex: 5
           }}
         />
 
@@ -211,11 +238,12 @@ const Landing = () => {
             }
           }}
           style={{
-            width: '100px',
-            height: '100px',
+            width: '120px',
+            height: '120px',
             filter: 'drop-shadow(0 44px 22.4px rgba(0, 0, 0, 0.25))',
-            left: '270px',
-            top: '564px'
+            left: 'calc(50% + 60px)',
+            top: '70%',
+            zIndex: 5
           }}
         />
 
@@ -223,7 +251,7 @@ const Landing = () => {
         <motion.img 
           src={BtcAsset} 
           alt="Crypto icon" 
-          className="absolute w-48 h-48"
+          className="absolute"
           initial={{ opacity: 0, x: -40, y: 20 }}
           animate={{ 
             opacity: 1, 
@@ -240,36 +268,32 @@ const Landing = () => {
             }
           }}
           style={{
+            width: '192px',
+            height: '192px',
             filter: 'drop-shadow(0 44px 22.4px rgba(0, 0, 0, 0.25))',
-            left: '10px',
-            top: '270px'
+            left: 'calc(50% - 200px)',
+            top: '250px',
+            zIndex: 5
           }}
         />
-
-        {/* Connect Wallet Button */}
-        <motion.div 
-          className="absolute flex items-center rounded-full cursor-pointer justify-center align-center top-[664px] left-28"
-          initial={{ opacity: 0, y: 30, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.8, delay: 1.8 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <TonConnectButton />
-        </motion.div>
       </motion.div>
 
-      {/* Responsive scaling using CSS-in-JS for larger screens */}
+      {/* Responsive scaling for larger screens */}
       <style dangerouslySetInnerHTML={{
         __html: `
           @media (min-width: 768px) {
-            .absolute[style*="360px"] {
-              transform: translate(-50%, -50%) scale(1.2) !important;
+            .absolute[style*="calc(50%"] {
+              transform: scale(1.2);
             }
           }
           @media (min-width: 1024px) {
-            .absolute[style*="360px"] {
-              transform: translate(-50%, -50%) scale(1.5) !important;
+            .absolute[style*="calc(50%"] {
+              transform: scale(1.5);
+            }
+          }
+          @media (min-width: 1440px) {
+            .absolute[style*="calc(50%"] {
+              transform: scale(1.8);
             }
           }
         `
