@@ -171,7 +171,7 @@ const TransactionCard = ({
         <div className="flex flex-col h-[205px] items-center justify-start overflow-clip pb-0 pt-4 px-0 relative w-[265px]">
           
           {/* Header with Swap title and balance */}
-          <div className="flex items-center justify-between px-8 py-0 relative shrink-0 w-full">
+          <div className="flex items-center justify-between px-6 py-0 relative shrink-0 w-full">
             <div className="flex gap-2.5 items-center justify-center overflow-clip pb-4 pt-0 px-0 relative shrink-0">
               <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#707173] text-[14px] leading-[20px]">Swap</span>
             </div>
@@ -193,7 +193,7 @@ const TransactionCard = ({
           </div>
           
           {/* From Token Section */}
-          <div className="flex h-[70px] items-center justify-between overflow-clip p-[32px] relative shrink-0 w-full">
+          <div className="flex h-[70px] items-center justify-between overflow-clip p-6 relative shrink-0 w-full">
             <div className="flex gap-3.5 items-center justify-start relative shrink-0">
               <div className="flex items-end justify-end pl-0 pr-3 py-0 relative shrink-0">
                 <div className="mr-[-12px] relative rounded-[100px] shrink-0 size-9">
@@ -205,20 +205,13 @@ const TransactionCard = ({
                     </div>
                   )}
                 </div>
-                <div className="absolute bg-[#ffffff] bottom-[-2px] flex gap-2 items-center justify-start p-[2px] right-[-2px] rounded-[1000px] border border-[#ffffff] shadow-[0px_1px_1px_-0.5px_rgba(0,0,0,0.04),0px_3px_3px_-1.5px_rgba(0,0,0,0.04)]">
-                  <div className="relative shrink-0 size-3">
-                    <div className="w-3 h-3 bg-[#1E8148] rounded-full flex items-center justify-center">
-                      <span className="text-white text-[6px] leading-[8px]">✓</span>
-                    </div>
-                  </div>
-                </div>
               </div>
-              <div className="flex flex-col gap-2.5 items-start justify-start leading-[0] not-italic relative shrink-0">
+              <div className="flex flex-col gap-1 items-start justify-start leading-[0] not-italic relative shrink-0">
                 <span className="font-['Inter:Medium',_sans-serif] font-medium text-[#ffffff] text-[16px] leading-[24px]">{fromAsset?.meta?.displayName || fromToken}</span>
                 <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#707173] text-[12px] leading-[16px]">{fromAsset?.kind || 'Token'}</span>
               </div>
             </div>
-            <div className="flex flex-col gap-2.5 items-end justify-center leading-[0] not-italic relative shrink-0 text-right">
+            <div className="flex flex-col gap-1 items-end justify-center leading-[0] not-italic relative shrink-0 text-right">
               <span className="font-['Inter:Medium',_sans-serif] font-medium text-[#ffffff] text-[16px] leading-[24px]">{fromAmount}</span>
               <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#707173] text-[12px] leading-[16px]">${fromAmountUsd}</span>
             </div>
@@ -230,7 +223,7 @@ const TransactionCard = ({
           </div>
           
           {/* To Token Section */}
-          <div className="flex h-[70px] items-center justify-between overflow-clip p-[32px] relative shrink-0 w-full">
+          <div className="flex h-[70px] items-center justify-between overflow-clip p-6 relative shrink-0 w-full">
             <div className="flex gap-3.5 items-center justify-start relative shrink-0">
               <div className="flex items-end justify-end pl-0 pr-3 py-0 relative shrink-0">
                 <div className="mr-[-12px] relative rounded-[100px] shrink-0 size-9">
@@ -242,20 +235,13 @@ const TransactionCard = ({
                     </div>
                   )}
                 </div>
-                <div className="absolute bg-[#ffffff] bottom-[-2px] flex gap-2 items-center justify-start p-[2px] right-[-2px] rounded-[1000px] border border-[#ffffff] shadow-[0px_1px_1px_-0.5px_rgba(0,0,0,0.04),0px_3px_3px_-1.5px_rgba(0,0,0,0.04)]">
-                  <div className="relative shrink-0 size-3">
-                    <div className="w-3 h-3 bg-[#1E8148] rounded-full flex items-center justify-center">
-                      <span className="text-white text-[6px] leading-[8px]">✓</span>
-                    </div>
-                  </div>
-                </div>
               </div>
-              <div className="flex flex-col gap-2.5 items-start justify-start leading-[0] not-italic relative shrink-0">
+              <div className="flex flex-col gap-1 items-start justify-start leading-[0] not-italic relative shrink-0">
                 <span className="font-['Inter:Medium',_sans-serif] font-medium text-[#ffffff] text-[16px] leading-[24px]">{toAsset?.meta?.displayName || toToken}</span>
                 <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#707173] text-[12px] leading-[16px]">{toAsset?.kind || 'Token'}</span>
               </div>
             </div>
-            <div className="flex flex-col gap-2.5 items-end justify-center leading-[0] not-italic relative shrink-0 text-right">
+            <div className="flex flex-col gap-1 items-end justify-center leading-[0] not-italic relative shrink-0 text-right">
               <span className="font-['Inter:Medium',_sans-serif] font-medium text-[#ffffff] text-[16px] leading-[24px]">{toAmount}</span>
               <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#707173] text-[12px] leading-[16px]">${toAmountUsd}</span>
             </div>
