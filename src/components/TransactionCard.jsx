@@ -7,6 +7,7 @@ import { Address } from "@ton/core";
 import WalletIcon from "../assets/wallet.svg";
 import { LoaderCircle } from "lucide-react";
 import tonApiClient from "../utils/tonClient";
+import { useWalletBalance } from "../contexts/WalletBalanceContext";
 
 const TransactionCard = ({ 
   transaction, 
@@ -18,28 +19,11 @@ const TransactionCard = ({
   const [isLoading, setIsLoading] = useState(false);
   const [transactionState, setTransactionState] = useState(propTransactionState || 'idle');
   const [errorMessage, setErrorMessage] = useState(propErrorMessage || '');
-  const [walletBalance, setWalletBalance] = useState('0.00');
-  const [balanceLoading, setBalanceLoading] = useState(false);
-  const [tonConnectUI] = useTonConnectUI();
+  const { balance: walletBalance, balanceLoading } = useWalletBalance();
   const userFriendlyAddress = useTonAddress();
+  const [tonConnectUI] = useTonConnectUI();
 
-  // Fetch wallet balance
-  const fetchWalletBalance = async () => {
-    if (!userFriendlyAddress) return;
-    
-    try {
-      setBalanceLoading(true);
-      const address = Address.parse(userFriendlyAddress);
-      const balance = await tonApiClient.getBalance(address);
-      const balanceInTon = parseFloat(balance.toString()) / 1000000000;
-      setWalletBalance(balanceInTon.toFixed(2));
-    } catch (error) {
-      console.error('Error fetching wallet balance:', error);
-      setWalletBalance('0.00');
-    } finally {
-      setBalanceLoading(false);
-    }
-  };
+
 
   // Sync with props when they change
   useEffect(() => {
@@ -67,12 +51,6 @@ const TransactionCard = ({
     };
   }, [isLoading, transactionState]);
 
-  // Fetch balance when wallet is connected
-  useEffect(() => {
-    if (userFriendlyAddress) {
-      fetchWalletBalance();
-    }
-  }, [userFriendlyAddress]);
 
   // Extract data from transaction object
   const quote = transaction?.quote || transaction;
@@ -203,11 +181,8 @@ const TransactionCard = ({
                   <img src={WalletIcon} alt="Wallet" className="h-4 w-4" />
                 </div>
                 <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#ffffff] text-[14px] leading-[20px]">
-                  {balanceLoading ? <LoaderCircle className="animate-spin"/> : `${walletBalance} TON`}
+                  {balanceLoading ? <LoaderCircle className="animate-spin"/> : `${walletBalance || '0.00'} TON`}
                 </span>
-              </div>
-              <div className="bg-[rgba(29,129,71,0.2)] flex gap-[7.829px] h-5 items-center justify-center px-[15.659px] py-[9.395px] relative rounded-[782.156px] shrink-0 w-11 border border-[#1d8147]">
-                <span className="font-['Inter:Medium',_sans-serif] font-medium text-[#d3ffca] text-[10px] leading-[14px]">MAX</span>
               </div>
             </div>
           </div>
@@ -329,13 +304,13 @@ const TransactionCard = ({
       </button>
       
       {transactionState === 'error' && errorMessage && (
-        <div className="mt-2 p-2 bg-red-900/20 border border-red-600 rounded-lg w-full">
+        <div className="mt-4 p-2 bg-red-900/20 border border-red-600 rounded-lg w-full">
           <p className="text-red-400 text-[10px] leading-[14px]">{errorMessage}</p>
         </div>
       )}
       
       {transactionState === 'success' && (
-        <div className="mt-2 p-2 bg-green-900/20 border border-green-600 rounded-lg w-full">
+        <div className="mt-4 p-2 bg-green-900/20 border border-green-600 rounded-lg w-full">
           <p className="text-green-400 text-[10px] leading-[14px]">Transaction completed successfully!</p>
         </div>
       )}

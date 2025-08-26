@@ -21,24 +21,7 @@ function Home() {
   const [sessionId, setSessionId] = useState(null);
   const [conversationId, setConversationId] = useState(null);
   const [conversationContext, setConversationContext] = useState(null);
-  // const { processMessage, isLoading } = useActionHandler();
 
-  // const testSwap = async () => {
-  //   if (!tonConnectUI) return;
-  //   try {
-  //     await tonConnectUI.sendTransaction({
-  //       validUntil: Math.floor(Date.now() / 1000) + 600,
-  //       messages: [
-  //         {
-  //           address: userFriendlyAddress,
-  //           amount: "1000000",
-  //         },
-  //       ],
-  //     });
-  //   } catch (error) {
-  //     setLogs((prev) => prev + `\nError: ${error.message}`);
-  //   }
-  // };
   const sendMessage = async () => {
     if (!inputText.trim()) return;
     setIsLoading(true);

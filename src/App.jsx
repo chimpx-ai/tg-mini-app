@@ -1,18 +1,20 @@
 import { Routes, Route } from "react-router-dom";
+import { WalletBalanceProvider } from "./contexts/WalletBalanceContext";
+import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import "./App.css";
-import Landing from "./pages/Landing";
+
 function App() {
   return (
     <div className="App min-h-screen">
-      <div className="w-full mx-auto h-screen">
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/landing" element={<Landing />} />
-          {/* Add more routes here as needed */}
-        </Routes>
-      </div>
+      <WalletBalanceProvider>
+        <div className="w-full mx-auto h-screen">
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/home" element={<Home />} />
+          </Routes>
+        </div>
+      </WalletBalanceProvider>
     </div>
   );
 }
