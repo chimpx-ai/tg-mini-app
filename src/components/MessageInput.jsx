@@ -5,13 +5,32 @@ const MessageInput = ({
   inputText,
   setInputText,
   onSendMessage,
-  isLoading
+  isLoading,
+  conversationContext
 }) => {
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       onSendMessage();
     }
+  };
+
+  // Generate context-aware placeholder
+  const getPlaceholder = () => {
+    if (conversationContext?.missingParams?.length > 0) {
+      const missing = conversationContext.missingParams[0];
+      switch (missing) {
+        case 'amount':
+          return 'Enter the amount (e.g., 10, 5.5)...';
+        case 'fromToken':
+          return 'Enter the token to swap from (e.g., TON, USDT)...';
+        case 'toToken':
+          return 'Enter the token to swap to (e.g., USDT, STON)...';
+        default:
+          return `Enter ${missing}...`;
+      }
+    }
+    return 'Write a Message...';
   };
 
   return (
@@ -24,7 +43,7 @@ const MessageInput = ({
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Write a Messege..."
+            placeholder={getPlaceholder()}
             className="w-full h-12 bg-black/45 text-white px-6 py-2 rounded-full border-none outline-none font-normal font-['Inter:Medium',_sans-serif] placeholder-[#8D8D8D] focus:outline-none"
             disabled={isLoading}
           />

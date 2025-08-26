@@ -44,7 +44,12 @@ const MessageList = ({ messages, isLoading, onUpdateTransactionState }) => {
                       </div>
                     </div>
                   ) : (
-                    <MessageCard text={message.text} sender={message.sender} />
+                    <MessageCard 
+                      text={message.text} 
+                      sender={message.sender}
+                      messageType={message.messageType}
+                      missingParams={message.missingParams}
+                    />
                   )}
                 </div>
               ))}

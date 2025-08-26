@@ -1,6 +1,6 @@
 import chimpIcon from '../assets/ChimpX.svg'
 
-const MessageCard = ({ text, sender }) => {
+const MessageCard = ({ text, sender, messageType, missingParams }) => {
   return (
     <div className={`flex items-start gap-2 ${sender === "user" ? "justify-end" : "justify-start"}`}>
       {/* Bot avatar */}

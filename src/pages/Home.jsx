@@ -18,6 +18,9 @@ function Home() {
   const [currentChatId, setCurrentChatId] = useState(null);
   const [, setChatHistory] = useState([]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sessionId, setSessionId] = useState(null);
+  const [conversationId, setConversationId] = useState(null);
+  const [conversationContext, setConversationContext] = useState(null);
   // const { processMessage, isLoading } = useActionHandler();
 
   // const testSwap = async () => {
@@ -60,31 +63,73 @@ function Home() {
     const currentInput = inputText;
   
     try {
+      const requestBody = {
+        prompt: currentInput,
+        ...(sessionId && { sessionId }),
+        ...(conversationId && { conversationId }),
+        ...(userFriendlyAddress && { walletAddress: userFriendlyAddress }),
+        userId: userFriendlyAddress || 'anonymous',
+        isFollowUp: !!conversationId
+      };
+      
       const response = await fetch("http://localhost:3001/process", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: currentInput }),
+        body: JSON.stringify(requestBody),
       });
       const resp = await response.json();
       console.log("resp", resp);
       
-      // Check if response contains transaction/swap data
-      const isTransaction = resp && (resp.quote || resp.data?.simulateSwapResponse || resp.action === 'swap');
+      // Store sessionId and conversationId for conversation continuity
+      if (resp.sessionId) {
+        setSessionId(resp.sessionId);
+      }
+      if (resp.conversationId) {
+        setConversationId(resp.conversationId);
+      }
       
-      const botMessage = {
-        id: Date.now() + 1,
-        text: isTransaction ? "Check Details for the swap transaction" : (resp.reasoning || resp.message || "Here's the information you requested"),
-        sender: "bot",
-        timestamp: new Date().toLocaleTimeString(),
-        ...(isTransaction && {
-          transaction: resp,
-          actionType: 'swap',
-          transactionState: 'idle',
-          errorMessage: null,
-          transactionHash: null,
-          swapCompleted: false
-        })
-      };
+      // Handle different response types
+      let botMessage;
+      
+      if (resp.action === 'clarification') {
+        // Handle clarification response
+        setConversationContext(resp.context);
+        botMessage = {
+          id: Date.now() + 1,
+          text: resp.message,
+          sender: "bot",
+          timestamp: new Date().toLocaleTimeString(),
+          messageType: 'clarification',
+          missingParams: resp.missingParams || [],
+          context: resp.context
+        };
+      } else if (resp.action === 'quote' || resp.action === 'swap') {
+        // Handle transaction/swap data
+        const isTransaction = resp && (resp.quote || resp.data?.simulateSwapResponse || resp.action === 'swap');
+        botMessage = {
+          id: Date.now() + 1,
+          text: isTransaction ? "Check Details for the swap transaction" : (resp.message || resp.reasoning || "Here's the information you requested"),
+          sender: "bot",
+          timestamp: new Date().toLocaleTimeString(),
+          ...(isTransaction && {
+            transaction: resp,
+            actionType: 'swap',
+            transactionState: 'idle',
+            errorMessage: null,
+            transactionHash: null,
+            swapCompleted: false
+          })
+        };
+      } else {
+        // Handle conversational response
+        botMessage = {
+          id: Date.now() + 1,
+          text: resp.message || resp.reasoning || "Here's the information you requested",
+          sender: "bot",
+          timestamp: new Date().toLocaleTimeString(),
+          messageType: 'conversational'
+        };
+      }
 
       const finalMessages = [...newMessages, botMessage];
       setMessages(finalMessages);
@@ -140,6 +185,9 @@ function Home() {
     const newChatId = ChatStorage.createNewChat(userFriendlyAddress);
     setCurrentChatId(newChatId);
     setMessages([]);
+    setSessionId(null);
+    setConversationId(null);
+    setConversationContext(null);
     loadChatHistory(); // Refresh chat list
   };
 
@@ -244,6 +292,7 @@ function Home() {
               isLoading={isLoading}
               setInputText={setInputText}
               onSendMessage={sendMessage}
+              conversationContext={conversationContext}
             />
           </>
         )}
