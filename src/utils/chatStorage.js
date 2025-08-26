@@ -13,7 +13,7 @@ export class ChatStorage {
   // Get all chat sessions
   static getAllChats() {
     try {
-      const stored = localStorage.getItem(CHAT_STORAGE_KEY);
+      const stored = sessionStorage.getItem(CHAT_STORAGE_KEY);
       return stored ? JSON.parse(stored) : {};
     } catch (error) {
       console.error('Error loading chat history:', error);
@@ -54,7 +54,7 @@ export class ChatStorage {
         chatsToRemove.forEach(chat => delete allChats[chat.id]);
       }
       
-      localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(allChats));
+      sessionStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(allChats));
       return true;
     } catch (error) {
       console.error('Error saving chat:', error);
@@ -131,7 +131,7 @@ export class ChatStorage {
     try {
       const allChats = this.getAllChats();
       delete allChats[chatId];
-      localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(allChats));
+      sessionStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(allChats));
       return true;
     } catch (error) {
       console.error('Error deleting chat:', error);
@@ -181,7 +181,7 @@ export class ChatStorage {
   // Clear all chat history
   static clearAllChats() {
     try {
-      localStorage.removeItem(CHAT_STORAGE_KEY);
+      sessionStorage.removeItem(CHAT_STORAGE_KEY);
       return true;
     } catch (error) {
       console.error('Error clearing chat history:', error);
@@ -201,7 +201,7 @@ export class ChatStorage {
       return {
         chatCount,
         totalMessages,
-        storageSize: localStorage.getItem(CHAT_STORAGE_KEY)?.length || 0
+        storageSize: sessionStorage.getItem(CHAT_STORAGE_KEY)?.length || 0
       };
     } catch (error) {
       console.error('Error getting storage info:', error);
