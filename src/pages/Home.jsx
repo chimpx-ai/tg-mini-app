@@ -72,7 +72,7 @@ function Home() {
         isFollowUp: !!conversationId
       };
       
-      const response = await fetch("http://localhost:3001/process", {
+      const response = await fetch("https://chimpxtonapi.chimpx.ai/process", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),
