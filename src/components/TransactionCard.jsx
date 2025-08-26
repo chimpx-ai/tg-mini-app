@@ -1,16 +1,92 @@
 import { CheckCircle, XCircle, ArrowDownUp } from "lucide-react";
-import { dexFactory, Client } from "@ston-fi/sdk";
+import { dexFactory } from "@ston-fi/sdk";
 import { useTonConnectUI, useTonAddress } from "@tonconnect/ui-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Cell } from "@ton/core";
+import { Address } from "@ton/core";
 import WalletIcon from "../assets/wallet.svg";
+import { LoaderCircle } from "lucide-react";
+import tonApiClient from "../utils/tonClient";
 
-const TransactionCard = ({ transaction }) => {
+const TransactionCard = ({ 
+  transaction, 
+  messageId, 
+  transactionState: propTransactionState, 
+  errorMessage: propErrorMessage, 
+  onUpdateTransactionState 
+}) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [transactionState, setTransactionState] = useState('idle'); // 'idle', 'success', 'error'
-  const [errorMessage, setErrorMessage] = useState('');
+  const [transactionState, setTransactionState] = useState(propTransactionState || 'idle');
+  const [errorMessage, setErrorMessage] = useState(propErrorMessage || '');
+  const [walletBalance, setWalletBalance] = useState('0.00');
+  const [balanceLoading, setBalanceLoading] = useState(false);
   const [tonConnectUI] = useTonConnectUI();
   const userFriendlyAddress = useTonAddress();
+
+  // Fetch wallet balance
+  const fetchWalletBalance = async () => {
+    if (!userFriendlyAddress) return;
+    
+    try {
+      setBalanceLoading(true);
+      const address = Address.parse(userFriendlyAddress);
+      const balance = await tonApiClient.getBalance(address);
+      const balanceInTon = parseFloat(balance.toString()) / 1000000000;
+      setWalletBalance(balanceInTon.toFixed(2));
+    } catch (error) {
+      console.error('Error fetching wallet balance:', error);
+      setWalletBalance('0.00');
+    } finally {
+      setBalanceLoading(false);
+    }
+  };
+
+  // Sync with props when they change
+  useEffect(() => {
+    if (propTransactionState) {
+      setTransactionState(propTransactionState);
+    }
+    if (propErrorMessage) {
+      setErrorMessage(propErrorMessage);
+    }
+  }, [propTransactionState, propErrorMessage]);
+
+  useEffect(() => {
+    const handleTransactionResult = () => {
+      // Reset loading state when user returns from wallet
+      if (isLoading && transactionState === 'idle') {
+        setIsLoading(false);
+      }
+    };
+
+    // Listen for focus events to detect when user returns from wallet
+    window.addEventListener('focus', handleTransactionResult);
+    
+    return () => {
+      window.removeEventListener('focus', handleTransactionResult);
+    };
+  }, [isLoading, transactionState]);
+
+  // Fetch balance when wallet is connected
+  useEffect(() => {
+    if (userFriendlyAddress) {
+      fetchWalletBalance();
+    }
+  }, [userFriendlyAddress]);
+
+  // Extract data from transaction object
+  const quote = transaction?.quote || transaction;
+  const fromAsset = quote?.data?.fromAssetInfo;
+  const toAsset = quote?.data?.toAssetInfo;
+  const simulateSwap = quote?.data?.simulateSwapResponse;
+  
+  // Fallback values if data is not available
+  const fromToken = fromAsset?.meta?.symbol || quote?.fromToken || 'TON';
+  const toToken = toAsset?.meta?.symbol || quote?.toToken || 'STON';
+  const fromAmount = parseFloat(quote?.amountIn || simulateSwap?.formattedOutputAmount || '0').toFixed(2);
+  const toAmount = parseFloat(quote?.amountOut || simulateSwap?.formattedOutputAmount || '0').toFixed(2);
+  const fromAmountUsd = (parseFloat(quote?.amountIn || simulateSwap?.formattedOutputAmount || '0') * parseFloat(fromAsset?.dexPriceUsd || '0')).toFixed(2);
+  const toAmountUsd = parseFloat(simulateSwap?.formattedOutputAmountUsd || (parseFloat(quote?.amountOut || simulateSwap?.formattedOutputAmount || '0') * parseFloat(toAsset?.dexPriceUsd || '0'))).toFixed(2);
 
   const confirmTransaction = async (transaction) => {
     try {
@@ -22,42 +98,40 @@ const TransactionCard = ({ transaction }) => {
         throw new Error('TonConnect UI not available');
       }
       console.log("transaction", transaction);
-      const tonApiClient = new Client({
-        endpoint: "https://toncenter.com/api/v2/jsonRPC",
-        apiKey:
-          "9688b0e4d8b6ead095f1271b3d2d3500073a6acb309846e83667bbf9f11e26c8",
-      });
       const routerMetadata =
-        transaction.data.simulateSwapResponse.routerMetadata;
+        transaction.quote?.data?.simulateSwapResponse?.routerMetadata || 
+        transaction.data?.simulateSwapResponse?.routerMetadata;
       const dexContracts = dexFactory(routerMetadata);
       const router = tonApiClient.open(
         dexContracts.Router.create(routerMetadata.address)
       );
+      const simulateSwapData = transaction.quote?.data?.simulateSwapResponse || transaction.data?.simulateSwapResponse;
       const sharedTxParams = {
         userWalletAddress: userFriendlyAddress,
-        offerAmount: transaction.data.simulateSwapResponse.offerUnits,
-        minAskAmount: transaction.data.simulateSwapResponse.minAskUnits,
+        offerAmount: simulateSwapData.offerUnits,
+        minAskAmount: simulateSwapData.minAskUnits,
       };
       let swapParams;
-      if (transaction.data.fromAssetInfo.kind === "Ton") {
+      const fromAssetInfo = transaction.quote?.data?.fromAssetInfo || transaction.data?.fromAssetInfo;
+      const toAssetInfo = transaction.quote?.data?.toAssetInfo || transaction.data?.toAssetInfo;
+      
+      if (fromAssetInfo.kind === "Ton") {
         swapParams = await router.getSwapTonToJettonTxParams({
           ...sharedTxParams,
           proxyTon: dexContracts.pTON.create(routerMetadata.ptonMasterAddress),
-          askJettonAddress: transaction.data.simulateSwapResponse.askAddress,
+          askJettonAddress: simulateSwapData.askAddress,
         });
-      } else if (transaction.data.toAssetInfo.kind === "Ton") {
+      } else if (toAssetInfo.kind === "Ton") {
         swapParams = await router.getSwapJettonToTonTxParams({
           ...sharedTxParams,
           proxyTon: dexContracts.pTON.create(routerMetadata.ptonMasterAddress),
-          offerJettonAddress:
-            transaction.data.simulateSwapResponse.offerAddress,
+          offerJettonAddress: simulateSwapData.offerAddress,
         });
       } else {
         swapParams = await router.getSwapJettonToJettonTxParams({
           ...sharedTxParams,
-          offerJettonAddress:
-            transaction.data.simulateSwapResponse.offerAddress,
-          askJettonAddress: transaction.data.simulateSwapResponse.askAddress,
+          offerJettonAddress: simulateSwapData.offerAddress,
+          askJettonAddress: simulateSwapData.askAddress,
         });
       }
       console.log("swapParams", swapParams);
@@ -78,12 +152,36 @@ const TransactionCard = ({ transaction }) => {
         const hashHex = buffer.toString("hex");
         setTransactionState('success');
         setIsLoading(false);
+        
+        // Update persistent storage
+        if (onUpdateTransactionState && messageId) {
+          onUpdateTransactionState(messageId, 'success', null, hashHex);
+        }
+        
         console.log("hashHex", hashHex, buffer, cell);
       }
     } catch (error) {
       console.log("error", error);
       setTransactionState('error');
-      setErrorMessage(error.message || 'Transaction failed. Please try again.');
+      
+      let errorMsg;
+      if (error.message && error.message.includes('User rejects the action')) {
+        errorMsg = 'Transaction cancelled by user.';
+      } else if (error.message && error.message.includes('Canceled by the user')) {
+        errorMsg = 'Transaction cancelled by user.';
+      } else if( error.message && error.message.includes('Transaction was not sent')){
+        errorMsg = 'Transaction failed. Please try again.';
+      } else {
+        errorMsg = error.message || 'Transaction failed. Please try again.';
+      }
+      
+      setErrorMessage(errorMsg);
+      
+      // Update persistent storage
+      if (onUpdateTransactionState && messageId) {
+        onUpdateTransactionState(messageId, 'error', errorMsg, null);
+      }
+      
       setIsLoading(false);
     }
   };
@@ -104,7 +202,9 @@ const TransactionCard = ({ transaction }) => {
                 <div className="overflow-clip relative shrink-0 size-4">
                   <img src={WalletIcon} alt="Wallet" className="h-4 w-4" />
                 </div>
-                <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#ffffff] text-[14px] leading-[20px]">$4503</span>
+                <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#ffffff] text-[14px] leading-[20px]">
+                  {balanceLoading ? <LoaderCircle className="animate-spin"/> : `${walletBalance} TON`}
+                </span>
               </div>
               <div className="bg-[rgba(29,129,71,0.2)] flex gap-[7.829px] h-5 items-center justify-center px-[15.659px] py-[9.395px] relative rounded-[782.156px] shrink-0 w-11 border border-[#1d8147]">
                 <span className="font-['Inter:Medium',_sans-serif] font-medium text-[#d3ffca] text-[10px] leading-[14px]">MAX</span>
@@ -117,14 +217,18 @@ const TransactionCard = ({ transaction }) => {
             <div className="absolute bottom-0 left-0 right-0 top-[-100%] bg-[#2a2c2e]"></div>
           </div>
           
-          {/* From Token Section - Dai */}
+          {/* From Token Section */}
           <div className="flex h-[70px] items-center justify-between overflow-clip p-[32px] relative shrink-0 w-full">
             <div className="flex gap-3.5 items-center justify-start relative shrink-0">
               <div className="flex items-end justify-end pl-0 pr-3 py-0 relative shrink-0">
                 <div className="mr-[-12px] relative rounded-[100px] shrink-0 size-9">
-                  <div className="w-9 h-9 bg-[#FF007A] rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-[14px] leading-[20px]">U</span>
-                  </div>
+                  {fromAsset?.meta?.imageUrl ? (
+                    <img src={fromAsset.meta.imageUrl} alt={fromToken} className="w-9 h-9 rounded-full" />
+                  ) : (
+                    <div className="w-9 h-9 bg-[#FF007A] rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold text-[14px] leading-[20px]">{fromToken?.charAt(0) || 'T'}</span>
+                    </div>
+                  )}
                 </div>
                 <div className="absolute bg-[#ffffff] bottom-[-2px] flex gap-2 items-center justify-start p-[2px] right-[-2px] rounded-[1000px] border border-[#ffffff] shadow-[0px_1px_1px_-0.5px_rgba(0,0,0,0.04),0px_3px_3px_-1.5px_rgba(0,0,0,0.04)]">
                   <div className="relative shrink-0 size-3">
@@ -135,13 +239,13 @@ const TransactionCard = ({ transaction }) => {
                 </div>
               </div>
               <div className="flex flex-col gap-2.5 items-start justify-start leading-[0] not-italic relative shrink-0">
-                <span className="font-['Inter:Medium',_sans-serif] font-medium text-[#ffffff] text-[16px] leading-[24px]">Dai</span>
-                <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#707173] text-[12px] leading-[16px]">Gnosis</span>
+                <span className="font-['Inter:Medium',_sans-serif] font-medium text-[#ffffff] text-[16px] leading-[24px]">{fromAsset?.meta?.displayName || fromToken}</span>
+                <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#707173] text-[12px] leading-[16px]">{fromAsset?.kind || 'Token'}</span>
               </div>
             </div>
             <div className="flex flex-col gap-2.5 items-end justify-center leading-[0] not-italic relative shrink-0 text-right">
-              <span className="font-['Inter:Medium',_sans-serif] font-medium text-[#ffffff] text-[16px] leading-[24px]">1020.01</span>
-              <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#707173] text-[12px] leading-[16px]">$1020.01</span>
+              <span className="font-['Inter:Medium',_sans-serif] font-medium text-[#ffffff] text-[16px] leading-[24px]">{fromAmount}</span>
+              <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#707173] text-[12px] leading-[16px]">${fromAmountUsd}</span>
             </div>
           </div>
           
@@ -150,14 +254,18 @@ const TransactionCard = ({ transaction }) => {
             <div className="absolute bottom-0 left-0 right-0 top-[-100%] bg-[#2a2c2e]"></div>
           </div>
           
-          {/* To Token Section - Uni */}
+          {/* To Token Section */}
           <div className="flex h-[70px] items-center justify-between overflow-clip p-[32px] relative shrink-0 w-full">
             <div className="flex gap-3.5 items-center justify-start relative shrink-0">
               <div className="flex items-end justify-end pl-0 pr-3 py-0 relative shrink-0">
                 <div className="mr-[-12px] relative rounded-[100px] shrink-0 size-9">
-                  <div className="w-9 h-9 bg-[#FF007A] rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-[14px] leading-[20px]">U</span>
-                  </div>
+                  {toAsset?.meta?.imageUrl ? (
+                    <img src={toAsset.meta.imageUrl} alt={toToken} className="w-9 h-9 rounded-full" />
+                  ) : (
+                    <div className="w-9 h-9 bg-[#FF007A] rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold text-[14px] leading-[20px]">{toToken?.charAt(0) || 'S'}</span>
+                    </div>
+                  )}
                 </div>
                 <div className="absolute bg-[#ffffff] bottom-[-2px] flex gap-2 items-center justify-start p-[2px] right-[-2px] rounded-[1000px] border border-[#ffffff] shadow-[0px_1px_1px_-0.5px_rgba(0,0,0,0.04),0px_3px_3px_-1.5px_rgba(0,0,0,0.04)]">
                   <div className="relative shrink-0 size-3">
@@ -168,13 +276,13 @@ const TransactionCard = ({ transaction }) => {
                 </div>
               </div>
               <div className="flex flex-col gap-2.5 items-start justify-start leading-[0] not-italic relative shrink-0">
-                <span className="font-['Inter:Medium',_sans-serif] font-medium text-[#ffffff] text-[16px] leading-[24px]">Uni</span>
-                <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#707173] text-[12px] leading-[16px]">Gnosis</span>
+                <span className="font-['Inter:Medium',_sans-serif] font-medium text-[#ffffff] text-[16px] leading-[24px]">{toAsset?.meta?.displayName || toToken}</span>
+                <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#707173] text-[12px] leading-[16px]">{toAsset?.kind || 'Token'}</span>
               </div>
             </div>
             <div className="flex flex-col gap-2.5 items-end justify-center leading-[0] not-italic relative shrink-0 text-right">
-              <span className="font-['Inter:Medium',_sans-serif] font-medium text-[#ffffff] text-[16px] leading-[24px]">400.25</span>
-              <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#707173] text-[12px] leading-[16px]">$1020.01</span>
+              <span className="font-['Inter:Medium',_sans-serif] font-medium text-[#ffffff] text-[16px] leading-[24px]">{toAmount}</span>
+              <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#707173] text-[12px] leading-[16px]">${toAmountUsd}</span>
             </div>
           </div>
           

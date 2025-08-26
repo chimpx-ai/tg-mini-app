@@ -3,7 +3,7 @@ import TransactionCard from "./TransactionCard";
 import MessageCard from "./MessageCard";
 import chimpIcon from '../assets/ChimpX.svg'
 
-const MessageList = ({ messages, isLoading }) => {
+const MessageList = ({ messages, isLoading, onUpdateTransactionState }) => {
   const messagesEndRef = useRef(null);
 
   // Auto-scroll to bottom when messages change
@@ -33,7 +33,14 @@ const MessageList = ({ messages, isLoading }) => {
                         />
                       </div>
                       <div className="flex justify-center">
-                        <TransactionCard transaction={message.transaction} />
+                        <TransactionCard 
+                          transaction={message.transaction} 
+                          messageId={message.id}
+                          transactionState={message.transactionState}
+                          errorMessage={message.errorMessage}
+                          transactionHash={message.transactionHash}
+                          onUpdateTransactionState={onUpdateTransactionState}
+                        />
                       </div>
                     </div>
                   ) : (

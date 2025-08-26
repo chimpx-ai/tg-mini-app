@@ -16,7 +16,7 @@ createRoot(document.getElementById("root")).render(
       <TonConnectUIProvider
         manifestUrl={manifestUrl}
         actionsConfiguration={{
-          twaReturnUrl: `https://t.me/@chimpxprasenjittestbot`,
+          twaReturnUrl: window.location.origin,
         }}
       >
         <App />
