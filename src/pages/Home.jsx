@@ -22,6 +22,17 @@ function Home() {
   const [conversationId, setConversationId] = useState(null);
   const [conversationContext, setConversationContext] = useState(null);
 
+  // Initialize with empty messages - real data will come from backend
+  useEffect(() => {
+    // Load existing chat messages if any
+    if (currentChatId) {
+      const chat = ChatStorage.getChat(currentChatId);
+      if (chat && chat.messages) {
+        setMessages(chat.messages);
+      }
+    }
+  }, [currentChatId]);
+
   const sendMessage = async () => {
     if (!inputText.trim()) return;
     setIsLoading(true);
@@ -103,11 +114,70 @@ function Home() {
             swapCompleted: false
           })
         };
+      } else if (resp.action === 'stakeQuote') {
+        // Handle stake quote data
+        botMessage = {
+          id: Date.now() + 1,
+          text: "Here's your staking transaction:",
+          sender: "bot",
+          timestamp: new Date().toLocaleTimeString(),
+          transaction: {
+            type: 'stake',
+            amount: resp.stakeQuote?.amount || '0',
+            apy: resp.stakeQuote?.apy || '8.5',
+            estimatedRewards: resp.stakeQuote?.estimatedRewards || '0',
+            stakingFee: resp.stakeQuote?.stakingFee || '0',
+            estimatedOutput: resp.stakeQuote?.estimatedOutput || '0',
+            description: resp.stakeQuote?.description || ''
+          },
+          transactionState: 'idle',
+          errorMessage: null,
+          transactionHash: null
+        };
+      } else if (resp.action === 'unstakeQuote') {
+        // Handle unstake quote data
+        botMessage = {
+          id: Date.now() + 1,
+          text: "Here's your unstaking transaction:",
+          sender: "bot",
+          timestamp: new Date().toLocaleTimeString(),
+          transaction: {
+            type: 'unstake',
+            amount: resp.unstakeQuote?.amount || '0',
+            unstakeType: resp.unstakeQuote?.unstakeType || 'instant',
+            fee: resp.unstakeQuote?.unstakingFee || '0',
+            netAmount: resp.unstakeQuote?.estimatedOutput || '0',
+            estimatedReceive: resp.unstakeQuote?.estimatedOutput || '0',
+            processingTime: resp.unstakeQuote?.estimatedTime || '48-72 hours',
+            description: resp.unstakeQuote?.description || ''
+          },
+          transactionState: 'idle',
+          errorMessage: null,
+          transactionHash: null
+        };
+      } else if (resp.action === 'balances') {
+        // Handle balance/portfolio data
+        botMessage = {
+          id: Date.now() + 1,
+          text: "Here's your wallet balance:",
+          sender: "bot",
+          timestamp: new Date().toLocaleTimeString(),
+          balanceData: resp.balances
+        };
+      } else if (resp.action === 'stakingInfo') {
+        // Handle staking info data
+        botMessage = {
+          id: Date.now() + 1,
+          text: resp.stakingInfo ? `Current APY: ${resp.stakingInfo.currentApy}%\nTotal Value Locked: ${resp.stakingInfo.totalValueLocked} TON\nStakers Count: ${resp.stakingInfo.stakersCount}\nInstant Liquidity: ${resp.stakingInfo.instantLiquidity ? 'Available' : 'Not Available'}` : (resp.message || "Here's the staking information"),
+          sender: "bot",
+          timestamp: new Date().toLocaleTimeString(),
+          messageType: 'conversational'
+        };
       } else {
         // Handle conversational response
         botMessage = {
           id: Date.now() + 1,
-          text: resp.message || resp.reasoning || "Here's the information you requested",
+          text: resp.message || resp.error || resp.reasoning || "Here's the information you requested",
           sender: "bot",
           timestamp: new Date().toLocaleTimeString(),
           messageType: 'conversational'

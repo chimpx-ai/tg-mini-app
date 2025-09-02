@@ -18,6 +18,23 @@ export const WalletBalanceProvider = ({ children }) => {
   const [balance, setBalance] = useState(null);
   const [balanceLoading, setBalanceLoading] = useState(false);
   const [balanceError, setBalanceError] = useState(null);
+  const [tonPrice, setTonPrice] = useState(3.11); // Default fallback price
+  const [priceLoading, setPriceLoading] = useState(false);
+
+  const fetchTonPrice = async () => {
+    setPriceLoading(true);
+    try {
+      const response = await fetch('https://tonapi.io/v2/rates?tokens=ton&currencies=usd');
+      const data = await response.json();
+      if (data.rates && data.rates.TON && data.rates.TON.prices && data.rates.TON.prices.USD) {
+        setTonPrice(data.rates.TON.prices.USD);
+      }
+    } catch (error) {
+      console.error('Error fetching TON price:', error);
+    } finally {
+      setPriceLoading(false);
+    }
+  };
 
   const fetchWalletBalance = async (address) => {
     if (!address) {
@@ -47,6 +64,11 @@ export const WalletBalanceProvider = ({ children }) => {
     fetchWalletBalance(userFriendlyAddress);
   }, [userFriendlyAddress]);
 
+  // Fetch TON price on component mount
+  useEffect(() => {
+    fetchTonPrice();
+  }, []);
+
   // Function to manually refresh balance
   const refreshBalance = () => {
     fetchWalletBalance(userFriendlyAddress);
@@ -57,7 +79,9 @@ export const WalletBalanceProvider = ({ children }) => {
     balanceLoading,
     balanceError,
     refreshBalance,
-    userFriendlyAddress
+    userFriendlyAddress,
+    tonPrice,
+    priceLoading
   };
 
   return (

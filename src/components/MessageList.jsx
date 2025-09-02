@@ -2,6 +2,7 @@ import { useRef, useEffect } from "react";
 import TransactionCard from "./TransactionCard";
 import StakeCard from "./StakeCard";
 import UnstakeCard from "./UnstakeCard";
+import BalanceCard from "./BalanceCard";
 import MessageCard from "./MessageCard";
 import chimpIcon from '../assets/ChimpX.svg'
 
@@ -63,6 +64,19 @@ const MessageList = ({ messages, isLoading, onUpdateTransactionState }) => {
                             onUpdateTransactionState={onUpdateTransactionState}
                           />
                         )}
+                      </div>
+                    </div>
+                  ) : message.balanceData ? (
+                    <div className="flex items-start gap-2 justify-start">
+                      <div className="w-[22px] h-[22px] flex-shrink-0 mt-1">
+                        <img
+                          src={chimpIcon}
+                          alt="chimp"
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      </div>
+                      <div className="flex justify-center">
+                        <BalanceCard balanceData={message.balanceData} />
                       </div>
                     </div>
                   ) : (
