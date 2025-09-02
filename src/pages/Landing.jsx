@@ -20,8 +20,6 @@ const Landing = () => {
   useEffect(() => {
     if (userFriendlyAddress) {
       navigate('/home');
-    } else {
-      navigate('/');
     }
   }, [userFriendlyAddress, navigate]);
 

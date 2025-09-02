@@ -12,7 +12,12 @@ const manifestUrl = `${appUr}/tonconnect-manifest.json`;
 console.log("manifestUrl", manifestUrl);
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
       <TonConnectUIProvider
         manifestUrl={manifestUrl}
         actionsConfiguration={{

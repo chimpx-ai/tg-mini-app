@@ -1,5 +1,7 @@
 import { useRef, useEffect } from "react";
 import TransactionCard from "./TransactionCard";
+import StakeCard from "./StakeCard";
+import UnstakeCard from "./UnstakeCard";
 import MessageCard from "./MessageCard";
 import chimpIcon from '../assets/ChimpX.svg'
 
@@ -33,14 +35,34 @@ const MessageList = ({ messages, isLoading, onUpdateTransactionState }) => {
                         />
                       </div>
                       <div className="flex justify-center">
-                        <TransactionCard 
-                          transaction={message.transaction} 
-                          messageId={message.id}
-                          transactionState={message.transactionState}
-                          errorMessage={message.errorMessage}
-                          transactionHash={message.transactionHash}
-                          onUpdateTransactionState={onUpdateTransactionState}
-                        />
+                        {message.transaction.type === 'stake' ? (
+                          <StakeCard 
+                            transaction={message.transaction} 
+                            messageId={message.id}
+                            transactionState={message.transactionState}
+                            errorMessage={message.errorMessage}
+                            transactionHash={message.transactionHash}
+                            onUpdateTransactionState={onUpdateTransactionState}
+                          />
+                        ) : message.transaction.type === 'unstake' ? (
+                          <UnstakeCard 
+                            transaction={message.transaction} 
+                            messageId={message.id}
+                            transactionState={message.transactionState}
+                            errorMessage={message.errorMessage}
+                            transactionHash={message.transactionHash}
+                            onUpdateTransactionState={onUpdateTransactionState}
+                          />
+                        ) : (
+                          <TransactionCard 
+                            transaction={message.transaction} 
+                            messageId={message.id}
+                            transactionState={message.transactionState}
+                            errorMessage={message.errorMessage}
+                            transactionHash={message.transactionHash}
+                            onUpdateTransactionState={onUpdateTransactionState}
+                          />
+                        )}
                       </div>
                     </div>
                   ) : (
