@@ -1,0 +1,213 @@
+{
+    "action": "quote",
+    "quote": {
+        "fromToken": "TON",
+        "toToken": "STON",
+        "amountIn": 5,
+        "amountOut": 21.053939431,
+        "priceImpact": 0.1,
+        "route": [
+            "TON",
+            "STON"
+        ],
+        "gasEstimate": 0.05,
+        "slippage": 0.005,
+        "data": {
+            "fromAssetInfo": {
+                "contractAddress": "EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c",
+                "kind": "Ton",
+                "meta": {
+                    "symbol": "TON",
+                    "displayName": "TON",
+                    "imageUrl": "https://asset.ston.fi/img/EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c/ee9fb21d17bc8d75c2a5f7b5f5f62d2bacec6b128f58b63cb841e98f7b74c4fc",
+                    "decimals": 9
+                },
+                "pairPriority": 95,
+                "popularityIndex": 1.7976931348623157e+308,
+                "tags": [
+                    "asset:default_symbol",
+                    "default_symbol",
+                    "asset:essential"
+                ],
+                "dexPriceUsd": "3.130000000000000"
+            },
+            "toAssetInfo": {
+                "contractAddress": "EQA2kCVNwVsil2EM2mB0SkXytxCqQjS4mttjDpnXmwG9T6bO",
+                "kind": "Jetton",
+                "meta": {
+                    "symbol": "STON",
+                    "displayName": "STON",
+                    "imageUrl": "https://asset.ston.fi/img/EQA2kCVNwVsil2EM2mB0SkXytxCqQjS4mttjDpnXmwG9T6bO/3a4450f5f56f1ee24a26ada8ddc93c02310ac138557f682e6eb2ab5f4c83b09d",
+                    "decimals": 9
+                },
+                "popularityIndex": 11.027937180119515,
+                "tags": [
+                    "asset:liquidity:very_high",
+                    "asset:essential",
+                    "high_liquidity",
+                    "asset:popular",
+                    "default_symbol",
+                    "asset:default_symbol"
+                ],
+                "dexPriceUsd": "0.7435546845528985"
+            },
+            "simulateSwapResponse": {
+                "offerAddress": "EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c",
+                "askAddress": "EQA2kCVNwVsil2EM2mB0SkXytxCqQjS4mttjDpnXmwG9T6bO",
+                "offerJettonWallet": "EQARULUYsmJq1RiZ-YiH-IJLcAZUVkVff-KBPwEmmaQGH6aC",
+                "askJettonWallet": "EQCHuSJBqmpX3zEnFGDBCcVN_ZiaGuoDL2EH0sZdboh5zkwy",
+                "routerAddress": "EQB3ncyBUTjZUA5EnFKR5_EnOMI9V1tTEAAPaiU71gc4TiUt",
+                "poolAddress": "EQDtZHOtVWaf9UIU6rmjLPNLTGxNLNogvK5xUZlMRgZwQ4Gt",
+                "offerUnits": "5000000000",
+                "askUnits": "21053939431",
+                "slippageTolerance": "0.005",
+                "minAskUnits": "20948669733",
+                "recommendedSlippageTolerance": "0.005",
+                "recommendedMinAskUnits": "20948669733",
+                "swapRate": "4.210787886",
+                "priceImpact": "0.000347593",
+                "feeAddress": "EQA2kCVNwVsil2EM2mB0SkXytxCqQjS4mttjDpnXmwG9T6bO",
+                "feeUnits": "63451242",
+                "feePercent": "0.003004691",
+                "gasParams": {
+                    "forwardGas": "185000000",
+                    "estimatedGasConsumption": "45000000"
+                },
+                "routerMetadata": {
+                    "address": "EQB3ncyBUTjZUA5EnFKR5_EnOMI9V1tTEAAPaiU71gc4TiUt",
+                    "majorVersion": 1,
+                    "minorVersion": 0,
+                    "ptonMasterAddress": "EQCM3B12QK1e4yZSf8GtBRT0aLMNyEsBc_DhVfRRtOEffLez",
+                    "ptonWalletAddress": "EQARULUYsmJq1RiZ-YiH-IJLcAZUVkVff-KBPwEmmaQGH6aC",
+                    "ptonVersion": "1.0",
+                    "routerType": "ConstantProduct",
+                    "poolCreationEnabled": false
+                },
+                "formattedOutputAmount": "21.053939431",
+                "minimumOutputAmount": "20.948669733",
+                "formattedOutputAmountUsd": "15.6547552922130363344907535",
+                "minimumOutputAmountUsd": "15.5764815151236674443711005"
+            }
+        }
+    },
+    "executedSteps": [
+        {
+            "toolName": "validateTokenPair",
+            "parameters": {
+                "fromToken": "TON",
+                "toToken": "STON"
+            },
+            "stepNumber": 1,
+            "result": {
+                "valid": true
+            }
+        },
+        {
+            "toolName": "getSwapQuote",
+            "parameters": {
+                "fromToken": "TON",
+                "toToken": "STON",
+                "amount": 5,
+                "slippage": 0.005
+            },
+            "stepNumber": 2,
+            "result": {
+                "fromToken": "TON",
+                "toToken": "STON",
+                "amountIn": 5,
+                "amountOut": 21.053939431,
+                "priceImpact": 0.1,
+                "route": [
+                    "TON",
+                    "STON"
+                ],
+                "gasEstimate": 0.05,
+                "slippage": 0.005,
+                "data": {
+                    "fromAssetInfo": {
+                        "contractAddress": "EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c",
+                        "kind": "Ton",
+                        "meta": {
+                            "symbol": "TON",
+                            "displayName": "TON",
+                            "imageUrl": "https://asset.ston.fi/img/EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c/ee9fb21d17bc8d75c2a5f7b5f5f62d2bacec6b128f58b63cb841e98f7b74c4fc",
+                            "decimals": 9
+                        },
+                        "pairPriority": 95,
+                        "popularityIndex": 1.7976931348623157e+308,
+                        "tags": [
+                            "asset:default_symbol",
+                            "default_symbol",
+                            "asset:essential"
+                        ],
+                        "dexPriceUsd": "3.130000000000000"
+                    },
+                    "toAssetInfo": {
+                        "contractAddress": "EQA2kCVNwVsil2EM2mB0SkXytxCqQjS4mttjDpnXmwG9T6bO",
+                        "kind": "Jetton",
+                        "meta": {
+                            "symbol": "STON",
+                            "displayName": "STON",
+                            "imageUrl": "https://asset.ston.fi/img/EQA2kCVNwVsil2EM2mB0SkXytxCqQjS4mttjDpnXmwG9T6bO/3a4450f5f56f1ee24a26ada8ddc93c02310ac138557f682e6eb2ab5f4c83b09d",
+                            "decimals": 9
+                        },
+                        "popularityIndex": 11.027937180119515,
+                        "tags": [
+                            "asset:liquidity:very_high",
+                            "asset:essential",
+                            "high_liquidity",
+                            "asset:popular",
+                            "default_symbol",
+                            "asset:default_symbol"
+                        ],
+                        "dexPriceUsd": "0.7435546845528985"
+                    },
+                    "simulateSwapResponse": {
+                        "offerAddress": "EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c",
+                        "askAddress": "EQA2kCVNwVsil2EM2mB0SkXytxCqQjS4mttjDpnXmwG9T6bO",
+                        "offerJettonWallet": "EQARULUYsmJq1RiZ-YiH-IJLcAZUVkVff-KBPwEmmaQGH6aC",
+                        "askJettonWallet": "EQCHuSJBqmpX3zEnFGDBCcVN_ZiaGuoDL2EH0sZdboh5zkwy",
+                        "routerAddress": "EQB3ncyBUTjZUA5EnFKR5_EnOMI9V1tTEAAPaiU71gc4TiUt",
+                        "poolAddress": "EQDtZHOtVWaf9UIU6rmjLPNLTGxNLNogvK5xUZlMRgZwQ4Gt",
+                        "offerUnits": "5000000000",
+                        "askUnits": "21053939431",
+                        "slippageTolerance": "0.005",
+                        "minAskUnits": "20948669733",
+                        "recommendedSlippageTolerance": "0.005",
+                        "recommendedMinAskUnits": "20948669733",
+                        "swapRate": "4.210787886",
+                        "priceImpact": "0.000347593",
+                        "feeAddress": "EQA2kCVNwVsil2EM2mB0SkXytxCqQjS4mttjDpnXmwG9T6bO",
+                        "feeUnits": "63451242",
+                        "feePercent": "0.003004691",
+                        "gasParams": {
+                            "forwardGas": "185000000",
+                            "estimatedGasConsumption": "45000000"
+                        },
+                        "routerMetadata": {
+                            "address": "EQB3ncyBUTjZUA5EnFKR5_EnOMI9V1tTEAAPaiU71gc4TiUt",
+                            "majorVersion": 1,
+                            "minorVersion": 0,
+                            "ptonMasterAddress": "EQCM3B12QK1e4yZSf8GtBRT0aLMNyEsBc_DhVfRRtOEffLez",
+                            "ptonWalletAddress": "EQARULUYsmJq1RiZ-YiH-IJLcAZUVkVff-KBPwEmmaQGH6aC",
+                            "ptonVersion": "1.0",
+                            "routerType": "ConstantProduct",
+                            "poolCreationEnabled": false
+                        },
+                        "formattedOutputAmount": "21.053939431",
+                        "minimumOutputAmount": "20.948669733",
+                        "formattedOutputAmountUsd": "15.6547552922130363344907535",
+                        "minimumOutputAmountUsd": "15.5764815151236674443711005"
+                    }
+                }
+            }
+        }
+    ],
+    "reasoning": "First validating if TON/STON pair can be traded, then getting swap quote with default slippage",
+    "prompt": "swap 5 TON for STON",
+    "timestamp": "2025-09-01T19:18:43.632Z",
+    "confidence": 0.9,
+    "processingTime": 3095,
+    "conversationId": "conv_1756754282544_it5th6gf9",
+    "sessionId": "session_1756754282542_99121mnwk"
+}

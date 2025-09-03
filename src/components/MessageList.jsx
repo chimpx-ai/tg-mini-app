@@ -79,6 +79,21 @@ const MessageList = ({ messages, isLoading, onUpdateTransactionState }) => {
                         <BalanceCard balanceData={message.balanceData} />
                       </div>
                     </div>
+                  ) : message.messageType === 'frontendAction' ? (
+                    <div className="flex items-start gap-2 justify-start">
+                      <div className="w-[22px] h-[22px] flex-shrink-0 mt-1">
+                        <img
+                          src={chimpIcon}
+                          alt="chimp"
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      </div>
+                      <div className="flex justify-center">
+                        {message.handler === 'checkBalance' && (
+                          <BalanceCard balanceData={message.balanceData} />
+                        )}
+                      </div>
+                    </div>
                   ) : (
                     <MessageCard 
                       text={message.text} 

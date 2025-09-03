@@ -3,6 +3,8 @@ import { useTonAddress } from '@tonconnect/ui-react';
 import { Address } from '@ton/core';
 import tonApiClient from '../utils/tonClient';
 
+const TON_API_BASE = 'https://tonapi.io/v2';
+
 const WalletBalanceContext = createContext();
 
 export const useWalletBalance = () => {
@@ -59,6 +61,53 @@ export const WalletBalanceProvider = ({ children }) => {
     }
   };
 
+  const fetchWalletData = async (address) => {
+    if (!address) {
+      return null;
+    }
+
+    try {
+      // Fetch TON balance
+      const parsedAddress = Address.parse(address);
+      const tonBalance = await tonApiClient.getBalance(parsedAddress);
+      
+      // Fetch jetton balances
+      const jettonsResponse = await fetch(
+        `${TON_API_BASE}/accounts/${encodeURIComponent(address)}/jettons?currencies=ton,usd&supported_extensions=custom_payload`
+      );
+      
+      if (!jettonsResponse.ok) {
+        throw new Error(`Failed to fetch jettons: ${jettonsResponse.status}`);
+      }
+      
+      const jettonsData = await jettonsResponse.json();
+      
+      const formattedData = {
+        ton: {
+          balance: tonBalance.toString(),
+          imageUrl: null
+        },
+        jettons: jettonsData.balances?.map(jetton => ({
+          balance: jetton.balance,
+          decimals: jetton.jetton?.decimals || 9,
+          symbol: jetton.jetton?.symbol || 'TOKEN',
+          name: jetton.jetton?.name || jetton.jetton?.symbol || 'TOKEN',
+          imageUrl: jetton.jetton?.image || null,
+          price: {
+            prices: {
+              USD: jetton.price?.prices?.USD || 0
+            }
+          }
+        })) || []
+      };
+      
+      return formattedData;
+    } catch (error) {
+      console.error('Error fetching wallet data:', error);
+      throw error;
+    }
+  };
+
   // Fetch balance when address changes
   useEffect(() => {
     fetchWalletBalance(userFriendlyAddress);
@@ -81,7 +130,8 @@ export const WalletBalanceProvider = ({ children }) => {
     refreshBalance,
     userFriendlyAddress,
     tonPrice,
-    priceLoading
+    priceLoading,
+    fetchWalletData
   };
 
   return (

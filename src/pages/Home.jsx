@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTonAddress } from "@tonconnect/ui-react";
 import { useNavigate } from "react-router-dom";
+import { useWalletBalance } from "../contexts/WalletBalanceContext";
 import Header from "../components/Header";
 import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
@@ -11,6 +12,7 @@ import ChatStorage from "../utils/chatStorage";
 function Home() {
   const userFriendlyAddress = useTonAddress();
   const navigate = useNavigate();
+  const { fetchWalletData } = useWalletBalance();
   // const [logs, setLogs] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -33,12 +35,20 @@ function Home() {
     }
   }, [currentChatId]);
 
-  const sendMessage = async () => {
-    if (!inputText.trim()) return;
+  const sendMessage = async (customMessage = null, options = {}) => {
+    const messageToSend = customMessage || inputText;
+    if (!messageToSend.trim()) return;
+    
+    // Check if this is a frontend-only action
+    if (options.frontendOnly) {
+      handleFrontendAction(messageToSend, options.handler);
+      return;
+    }
+    
     setIsLoading(true);
     const userMessage = {
       id: Date.now(),
-      text: inputText,
+      text: messageToSend,
       sender: "user",
       timestamp: new Date().toLocaleTimeString(),
     };
@@ -54,7 +64,7 @@ function Home() {
     
     // Save user message
     saveChatState(newMessages);
-    const currentInput = inputText;
+    const currentInput = messageToSend;
   
     try {
       const requestBody = {
@@ -187,7 +197,10 @@ function Home() {
       const finalMessages = [...newMessages, botMessage];
       setMessages(finalMessages);
       saveChatState(finalMessages);
-      setInputText("");
+      // Only clear input if it wasn't a custom message
+      if (!customMessage) {
+        setInputText("");
+      }
       setIsLoading(false);
     } catch (error) {
       const errorMessage = {
@@ -204,6 +217,10 @@ function Home() {
       const finalMessages = [...newMessages, errorMessage];
       setMessages(finalMessages);
       saveChatState(finalMessages);
+      // Only clear input if it wasn't a custom message
+      if (!customMessage) {
+        setInputText("");
+      }
       setIsLoading(false);
     }
   };
@@ -267,6 +284,60 @@ function Home() {
   // Toggle sidebar collapse
   const _toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
+  };
+
+  // Handle frontend-only actions
+  const handleFrontendAction = async (actionText, handler) => {
+    const userMessage = {
+      id: Date.now(),
+      text: actionText,
+      sender: "user",
+      timestamp: new Date().toLocaleTimeString(),
+    };
+
+    let botMessage;
+    
+    if (handler === "checkBalance") {
+      botMessage = {
+        id: Date.now() + 1,
+        text: "Checking your wallet balance...",
+        sender: "bot",
+        timestamp: new Date().toLocaleTimeString(),
+        messageType: 'frontendAction',
+        handler: handler,
+        balanceData: {
+          ton: { balance: "0", imageUrl: null },
+          jettons: []
+        }
+      };
+
+      const newMessages = [...messages, userMessage, botMessage];
+      setMessages(newMessages);
+      saveChatState(newMessages);
+
+      try {
+        const balanceData = await fetchWalletData(userFriendlyAddress);
+        const updatedBotMessage = {
+          ...botMessage,
+          text: "Here's your wallet balance:",
+          balanceData: balanceData
+        };
+
+        const finalMessages = [...messages, userMessage, updatedBotMessage];
+        setMessages(finalMessages);
+        saveChatState(finalMessages);
+      } catch (error) {
+        const errorBotMessage = {
+          ...botMessage,
+          text: `Error fetching balance: ${error.message}`,
+          balanceData: null
+        };
+
+        const finalMessages = [...messages, userMessage, errorBotMessage];
+        setMessages(finalMessages);
+        saveChatState(finalMessages);
+      }
+    }
   };
 
   // Update transaction state for a specific message
