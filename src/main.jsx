@@ -3,8 +3,18 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { TonConnectUIProvider } from "@tonconnect/ui-react";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import "./index.css";
 import App from "./App.jsx";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      retry: 2,
+    },
+  },
+});
 
 const appUr =
   "https://chimpxtg.netlify.app";
@@ -12,20 +22,22 @@ const manifestUrl = `${appUr}/tonconnect-manifest.json`;
 console.log("manifestUrl", manifestUrl);
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter
-      future={{
-        v7_startTransition: true,
-        v7_relativeSplatPath: true,
-      }}
-    >
-      <TonConnectUIProvider
-        manifestUrl={manifestUrl}
-        actionsConfiguration={{
-          twaReturnUrl: window.location.origin,
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
         }}
       >
-        <App />
-      </TonConnectUIProvider>
-    </BrowserRouter>
+        <TonConnectUIProvider
+          manifestUrl={manifestUrl}
+          actionsConfiguration={{
+            twaReturnUrl: window.location.origin,
+          }}
+        >
+          <App />
+        </TonConnectUIProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   </StrictMode>
 );

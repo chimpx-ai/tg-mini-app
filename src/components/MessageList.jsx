@@ -90,7 +90,10 @@ const MessageList = ({ messages, isLoading, onUpdateTransactionState }) => {
                       </div>
                       <div className="flex justify-center">
                         {message.handler === 'checkBalance' && (
-                          <BalanceCard balanceData={message.balanceData} />
+                          <BalanceCard 
+                            balanceData={message.balanceData} 
+                            isLoading={message.isLoading}
+                          />
                         )}
                       </div>
                     </div>

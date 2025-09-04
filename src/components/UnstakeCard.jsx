@@ -1,11 +1,11 @@
 import { CheckCircle, XCircle, TrendingDown } from "lucide-react";
 import { Tonstakers } from "tonstakers-sdk";
-import { useTonConnectUI } from "@tonconnect/ui-react";
+import { useTonConnectUI, useTonAddress } from "@tonconnect/ui-react";
 import { useState, useEffect } from "react";
 import { Cell, toNano } from "@ton/core";
 import WalletIcon from "../assets/wallet.svg";
 import { LoaderCircle } from "lucide-react";
-import { useWalletBalance } from "../contexts/WalletBalanceContext";
+import { useWalletData } from "../hooks/useWalletData";
 
 const UnstakeCard = ({ 
   transaction, 
@@ -17,7 +17,9 @@ const UnstakeCard = ({
   const [isLoading, setIsLoading] = useState(false);
   const [transactionState, setTransactionState] = useState(propTransactionState || 'idle');
   const [errorMessage, setErrorMessage] = useState(propErrorMessage || '');
-  const { balance: walletBalance, balanceLoading } = useWalletBalance();
+  const userFriendlyAddress = useTonAddress();
+  const { data: walletData, isLoading: balanceLoading } = useWalletData(userFriendlyAddress);
+  const walletBalance = walletData?.ton ? (parseFloat(walletData.ton.balance) / 1000000000).toFixed(2) : '0.00';
   const [tonConnectUI] = useTonConnectUI();
 
   // Sync with props when they change

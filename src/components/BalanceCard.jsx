@@ -1,10 +1,9 @@
-import { Wallet, TrendingUp } from "lucide-react";
+import { Wallet, TrendingUp, LoaderCircle } from "lucide-react";
 import WalletIcon from "../assets/wallet.svg";
-import { LoaderCircle } from "lucide-react";
-import { useWalletBalance } from "../contexts/WalletBalanceContext";
+import { useTonPrice } from "../hooks/useWalletData";
 
-const BalanceCard = ({ balanceData }) => {
-  const { tonPrice } = useWalletBalance();
+const BalanceCard = ({ balanceData, isLoading = false }) => {
+  const { data: tonPrice = 3.11 } = useTonPrice();
 
   // Extract data from balance response
   const tonBalance = balanceData?.ton || {};
@@ -61,6 +60,22 @@ const BalanceCard = ({ balanceData }) => {
       return bUsdValue - aUsdValue;
     })
     .slice(0, 3);
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center w-full max-w-[267px] mx-auto">
+        <div className="relative w-[265px] bg-[#1a1c1e] rounded-3xl border border-[#1a1c1e] shadow-[3px_4px_4px_-2px_rgba(211,255,202,0.25)]">
+          <div className="flex flex-col items-center justify-center h-[200px] p-6">
+            <LoaderCircle className="h-8 w-8 animate-spin text-[#599A6B] mb-4" />
+            <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#707173] text-[14px] leading-[20px]">
+              Loading wallet balance...
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center w-full max-w-[267px] mx-auto">

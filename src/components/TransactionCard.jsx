@@ -7,7 +7,7 @@ import { Address } from "@ton/core";
 import WalletIcon from "../assets/wallet.svg";
 import { LoaderCircle } from "lucide-react";
 import tonApiClient from "../utils/tonClient";
-import { useWalletBalance } from "../contexts/WalletBalanceContext";
+import { useWalletData } from "../hooks/useWalletData";
 
 const TransactionCard = ({ 
   transaction, 
@@ -19,8 +19,9 @@ const TransactionCard = ({
   const [isLoading, setIsLoading] = useState(false);
   const [transactionState, setTransactionState] = useState(propTransactionState || 'idle');
   const [errorMessage, setErrorMessage] = useState(propErrorMessage || '');
-  const { balance: walletBalance, balanceLoading } = useWalletBalance();
   const userFriendlyAddress = useTonAddress();
+  const { data: walletData, isLoading: balanceLoading } = useWalletData(userFriendlyAddress);
+  const walletBalance = walletData?.ton ? (parseFloat(walletData.ton.balance) / 1000000000).toFixed(2) : '0.00';
   const [tonConnectUI] = useTonConnectUI();
 
 

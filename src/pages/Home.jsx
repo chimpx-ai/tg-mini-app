@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTonAddress } from "@tonconnect/ui-react";
 import { useNavigate } from "react-router-dom";
-import { useWalletBalance } from "../contexts/WalletBalanceContext";
+import { useWalletData } from "../hooks/useWalletData";
 import Header from "../components/Header";
 import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
@@ -12,7 +12,7 @@ import ChatStorage from "../utils/chatStorage";
 function Home() {
   const userFriendlyAddress = useTonAddress();
   const navigate = useNavigate();
-  const { fetchWalletData } = useWalletBalance();
+  const { data: walletData, isLoading: walletDataLoading, refetch: refetchWalletData } = useWalletData(userFriendlyAddress);
   // const [logs, setLogs] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -298,6 +298,7 @@ function Home() {
     let botMessage;
     
     if (handler === "checkBalance") {
+      // Show loading message first
       botMessage = {
         id: Date.now() + 1,
         text: "Checking your wallet balance...",
@@ -305,10 +306,8 @@ function Home() {
         timestamp: new Date().toLocaleTimeString(),
         messageType: 'frontendAction',
         handler: handler,
-        balanceData: {
-          ton: { balance: "0", imageUrl: null },
-          jettons: []
-        }
+        balanceData: null,
+        isLoading: true
       };
 
       const newMessages = [...messages, userMessage, botMessage];
@@ -316,21 +315,31 @@ function Home() {
       saveChatState(newMessages);
 
       try {
-        const balanceData = await fetchWalletData(userFriendlyAddress);
+        // Refetch wallet data using TanStack Query
+        const { data: balanceData, error } = await refetchWalletData();
+        
+        if (error) {
+          throw error;
+        }
+
+        // Update the bot message with real data
         const updatedBotMessage = {
           ...botMessage,
           text: "Here's your wallet balance:",
-          balanceData: balanceData
+          balanceData: balanceData,
+          isLoading: false
         };
 
         const finalMessages = [...messages, userMessage, updatedBotMessage];
         setMessages(finalMessages);
         saveChatState(finalMessages);
       } catch (error) {
+        // Update with error message
         const errorBotMessage = {
           ...botMessage,
           text: `Error fetching balance: ${error.message}`,
-          balanceData: null
+          balanceData: null,
+          isLoading: false
         };
 
         const finalMessages = [...messages, userMessage, errorBotMessage];

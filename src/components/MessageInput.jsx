@@ -59,15 +59,15 @@ const ACTION_BUTTONS = [
     handler: "checkBalance"
   },
   { 
-    label: "Swap Tokens", 
-    action: "Swap Tokens",
+    label: "Swap 0.01 TON for STON", 
+    action: "Swap 0.01 TON for STON",
     available: true,
     frontendOnly: false,
     handler: null
   },
   { 
-    label: "Stake Tokens",
-    action: "Stake Tokens",
+    label: "Stake 0.01 TON",
+    action: "Stake 0.01 TON",
     available: true,
     frontendOnly: false,
     handler: null
