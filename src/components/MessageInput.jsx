@@ -1,7 +1,8 @@
-import { SendHorizontal, RefreshCw, ChartNoAxesColumn, TrendingUp, Vault, AudioLines } from "lucide-react";
+import { SendHorizontal, RefreshCw, ChartNoAxesColumn, TrendingUp, Vault, AudioLines, CreditCard } from "lucide-react";
 import { useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useWalletData } from "../hooks/useWalletData";
 import {
   Select,
   SelectContent,
@@ -80,7 +81,11 @@ const MessageInput = ({
   onSendMessage,
   isLoading,
   conversationContext,
+  userFriendlyAddress,
 }) => {
+
+  // Use the wallet data hook
+  const { totalWalletValue } = useWalletData(userFriendlyAddress);
 
   const handleKeyPress = useCallback((e) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -137,6 +142,13 @@ const MessageInput = ({
 
   return (
     <div className="py-2 flex flex-col flex-shrink-0 gap-2 mx-4">
+      <div className="flex flex-row justify-between items-center bg-[#0E1711] h-9 rounded-lg px-2">
+        <div className="flex flex-row gap-2 justify-start items-center">
+          <CreditCard className="size-4 text-white" />
+          <span className="text-sm">Wallet Balance</span>
+        </div>
+        <span className="text-sm font-bold text-[#72C689]">${totalWalletValue.toFixed(2)}</span>
+      </div>
       <div className="relative flex items-center gap-2">
         {/* Message Input Field */}
         <div className="flex flex-row gap-2 justify-start items-center w-full h-12 bg-[#0E1711] text-white rounded-lg border border-gray-700 px-1">

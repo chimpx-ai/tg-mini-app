@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { TonConnectButton, useTonConnectUI } from "@tonconnect/ui-react";
-import { FileText, Album } from "lucide-react";
+import { TonConnectButton, useTonConnectUI, useTonAddress } from "@tonconnect/ui-react";
+import { FileText, Album, Wallet, LogOut } from "lucide-react";
 import chimpLogo from "../assets/ChimpX-white-logo.svg";
 import {
   Select,
@@ -14,6 +14,7 @@ import {
 
 const Header = () => {
   const [tonConnectUI] = useTonConnectUI();
+  const userFriendlyAddress = useTonAddress();
 
   useEffect(() => {
     if (!tonConnectUI) return;
@@ -41,7 +42,43 @@ const Header = () => {
       unsubscribe();
     };
   }, [tonConnectUI]);
+
+  const handleConnectWallet = () => {
+    if (tonConnectUI) {
+      tonConnectUI.openModal();
+    } else {
+      console.error('TonConnect UI not available');
+    }
+  };
+
+  const handleDisconnectWallet = () => {
+    if (tonConnectUI) {
+      tonConnectUI.disconnect();
+    }
+  };
+
+  const formatAddress = (address) => {
+    if (!address) return "Connect Wallet";
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
   const SELECT_OPTIONS = [
+    ...(userFriendlyAddress ? [
+      {
+        value: "disconnect",
+        label: "Disconnect Wallet",
+        icon: LogOut,
+        action: handleDisconnectWallet,
+        isWalletAction: true
+      }
+    ] : [
+      {
+        value: "connect",
+        label: "Connect Wallet",
+        icon: Wallet,
+        action: handleConnectWallet,
+        isWalletAction: true
+      }
+    ]),
     { 
       value: "Docs", 
       label: "Docs", 
@@ -58,10 +95,20 @@ const Header = () => {
     <div className="flex items-center justify-between py-4 flex-shrink-0 mx-4">
       <img src={chimpLogo} alt="ChimpX Swap" className="h-10" />
       <div className="flex items-center gap-2">
-        <TonConnectButton />
-        <Select>
-          <SelectTrigger className="w-10 h-10 bg-[#0E1711] rounded-full border-none">
-            <SelectValue placeholder="aa" className="text-white" />
+        {/* Hidden TonConnectButton for connection functionality */}
+        <div className="hidden">
+          <TonConnectButton />
+        </div>
+        <Select onValueChange={(value) => {
+          const option = SELECT_OPTIONS.find(opt => opt.value === value);
+          if (option && option.action) {
+            option.action();
+          }
+        }}>
+          <SelectTrigger className="w-auto min-w-[120px] h-10 bg-[#0E1711] rounded-full border-none px-3">
+            <div className="text-white text-sm">
+              {formatAddress(userFriendlyAddress)}
+            </div>
           </SelectTrigger>
             <SelectContent className="w-[147px] bg-[#0E1711] border border-[#0E1711] text-white rounded-[8px] shadow-lg">
               {SELECT_OPTIONS.map((option, index) => {
@@ -70,7 +117,7 @@ const Header = () => {
                   <div key={option.value}>
                     <SelectItem 
                       value={option.value} 
-                      className={`text-white py-2 px-4 flex items-center gap-2 bg-transparent hover:bg-transparent focus:bg-transparent data-[highlighted]:bg-transparent focus:text-white data-[highlighted]:text-white`}
+                      className="text-white py-2 px-4 flex items-center gap-2 bg-transparent hover:bg-transparent focus:bg-transparent data-[highlighted]:bg-transparent focus:text-white data-[highlighted]:text-white"
                     >
                       <IconComponent className="size-3.5 text-white" />
                       <div className="flex flex-col items-start gap-1">

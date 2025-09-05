@@ -68,15 +68,42 @@ const fetchTonPrice = async () => {
   }
 };
 
+// Calculate total wallet value in USD
+const calculateTotalWalletValue = (walletData) => {
+  if (!walletData) return 0;
+  
+  const tonBalance = walletData.ton || {};
+  const jettonBalances = walletData.jettons || [];
+  
+  // Calculate TON value (assuming $3.11 per TON)
+  const tonValue = tonBalance.balance ? (parseFloat(tonBalance.balance) / 1000000000) * 3.11 : 0;
+  
+  // Calculate jetton values
+  const jettonsValue = jettonBalances.reduce((total, jetton) => {
+    const jettonUsdPrice = jetton.price?.prices?.USD || 0;
+    const jettonBalance = parseFloat(jetton.balance || '0');
+    const jettonDecimals = jetton.decimals || 9;
+    const mainUnit = jettonBalance / Math.pow(10, jettonDecimals);
+    return total + (mainUnit * jettonUsdPrice);
+  }, 0);
+  
+  return tonValue + jettonsValue;
+};
+
 // Custom hook for wallet data
 export const useWalletData = (address) => {
-  return useQuery({
+  const query = useQuery({
     queryKey: ['walletData', address],
     queryFn: () => fetchWalletData(address),
     enabled: !!address,
     staleTime: 2 * 60 * 1000, // 2 minutes
     retry: 2,
   });
+
+  return {
+    ...query,
+    totalWalletValue: calculateTotalWalletValue(query.data),
+  };
 };
 
 // Custom hook for TON price

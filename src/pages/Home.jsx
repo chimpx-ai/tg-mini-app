@@ -426,6 +426,7 @@ function Home() {
               setInputText={setInputText}
               onSendMessage={sendMessage}
               conversationContext={conversationContext}
+              userFriendlyAddress={userFriendlyAddress}
             />
           </>
         )}
