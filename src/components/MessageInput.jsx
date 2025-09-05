@@ -1,5 +1,5 @@
 import { SendHorizontal, RefreshCw, ChartNoAxesColumn, TrendingUp, Vault, AudioLines, CreditCard } from "lucide-react";
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useWalletData } from "../hooks/useWalletData";
@@ -83,6 +83,7 @@ const MessageInput = ({
   conversationContext,
   userFriendlyAddress,
 }) => {
+  const [selectedOption, setSelectedOption] = useState("swap");
 
   // Use the wallet data hook
   const { totalWalletValue } = useWalletData(userFriendlyAddress);
@@ -100,6 +101,7 @@ const MessageInput = ({
 
   // Handle select option selection
   const handleSelectOption = useCallback((value) => {
+    setSelectedOption(value);
     const selectedOption = SELECT_OPTIONS.find(option => option.value === value);
     if (selectedOption && selectedOption.available) {
       setInputText(selectedOption.action);
@@ -141,20 +143,29 @@ const MessageInput = ({
     }, [conversationContext?.missingParams]);
 
   return (
-    <div className="py-2 flex flex-col flex-shrink-0 gap-2 mx-4">
-      <div className="flex flex-row justify-between items-center bg-[#0E1711] h-9 rounded-lg px-2">
-        <div className="flex flex-row gap-2 justify-start items-center">
-          <CreditCard className="size-4 text-white" />
-          <span className="text-sm">Wallet Balance</span>
+    <div className="py-2 flex flex-col flex-shrink-0 gap-2 px-3 sm:px-4">
+      <div className="flex flex-row justify-between items-center bg-[#0E1711] h-8 sm:h-9 rounded-lg px-2">
+        <div className="flex flex-row gap-2 justify-start items-center min-w-0">
+          <CreditCard className="size-3 sm:size-4 text-white flex-shrink-0" />
+          <span className="text-xs sm:text-sm truncate">Wallet Balance</span>
         </div>
-        <span className="text-sm font-bold text-[#72C689]">${totalWalletValue.toFixed(2)}</span>
+        <span className="text-xs sm:text-sm font-bold text-[#72C689] flex-shrink-0">${totalWalletValue.toFixed(2)}</span>
       </div>
       <div className="relative flex items-center gap-2">
         {/* Message Input Field */}
-        <div className="flex flex-row gap-2 justify-start items-center w-full h-12 bg-[#0E1711] text-white rounded-lg border border-gray-700 px-1">
-          <Select onValueChange={handleSelectOption}>
-            <SelectTrigger className="w-[100px] h-8 bg-transparent border border-[#383838] text-white hover:bg-gray-800 rounded-md px-2">
-              <SelectValue placeholder="Swap" className="text-white" />
+        <div className="flex flex-row gap-2 sm:gap-2 justify-start items-center w-full h-12 bg-[#0E1711] text-white rounded-lg border border-gray-700 px-1">
+          <Select onValueChange={handleSelectOption} value={selectedOption}>
+            <SelectTrigger className="w-[100px] sm:w-[100px] h-8 bg-transparent border border-[#383838] text-white hover:bg-gray-800 rounded-md px-1 sm:px-2">
+              <div className="flex items-center gap-1">
+                {(() => {
+                  const currentOption = SELECT_OPTIONS.find(option => option.value === selectedOption);
+                  const IconComponent = currentOption?.icon || RefreshCw;
+                  return <IconComponent className="size-3 text-white" />;
+                })()}
+                <span className="text-white text-xs sm:text-sm">
+                  {SELECT_OPTIONS.find(option => option.value === selectedOption)?.label || "Swap"}
+                </span>
+              </div>
             </SelectTrigger>
             <SelectContent className="w-[147px] bg-[#0E1711] border border-[#0E1711] text-white rounded-[8px] shadow-lg">
               {SELECT_OPTIONS.map((option, index) => {
@@ -189,7 +200,7 @@ const MessageInput = ({
             onChange={handleInputChange}
             onKeyPress={handleKeyPress}
             placeholder={placeholder}
-            className="flex-1 h-8 bg-transparent text-white placeholder-[#8D8D8D] focus:outline-none font-normal font-['Inter:Medium',_sans-serif]"
+            className="flex-1 h-8 sm:h-8 bg-transparent text-white placeholder-[#8D8D8D] focus:outline-none font-normal font-['Inter:Medium',_sans-serif] text-sm sm:text-md"
             disabled={isLoading}
           />
         </div>
@@ -198,22 +209,22 @@ const MessageInput = ({
         <button
           onClick={onSendMessage}
           disabled={!inputText.trim() || isLoading}
-          className="bg-[#0E1711] rounded-lg transition-colors flex items-center justify-center p-3"
+          className="bg-[#0E1711] rounded-lg transition-colors flex items-center justify-center p-3 sm:p-3 flex-shrink-0"
         >
           <SendHorizontal className="text-[#599A6B] h-6 w-6" />
         </button>
       </div>
       {/* Quick Actions scrollable list */}
-      <ScrollArea className="w-98 md:w-full h-12" orientation="horizontal">
+      <ScrollArea className="w-[calc(100vw-20px)] h-10 sm:h-12" orientation="horizontal">
         <div
-          className="flex flex-row gap-2 justify-start items-center pb-2"
+          className="flex flex-row gap-1 sm:gap-2 justify-start items-center pb-2"
           style={{ minWidth: "max-content" }}
         >
           {ACTION_BUTTONS.map((action) => (
             <Button
               key={action.label}
               variant=""
-              className="bg-[#0E1711] whitespace-nowrap flex-shrink-0 hover:bg-gray-800 transition-colors"
+              className="bg-[#0E1711] whitespace-nowrap flex-shrink-0 hover:bg-gray-800 transition-colors text-xs sm:text-sm px-3 sm:px-3 py-1 sm:py-2 h-7 sm:h-8"
               onClick={() => handleActionButtonClick(action)}
             >
               {action.label}

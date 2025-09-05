@@ -190,13 +190,13 @@ const BalanceCard = ({ balanceData, isLoading = false }) => {
   const percentageChange = calculatePercentageChange();
 
   return (
-    <div className="flex flex-col items-start gap-2 w-full max-w-[267px] mx-auto">
+    <div className="flex flex-col items-start gap-2 w-full max-w-[300px] mx-auto">
       {/* Donut Chart */}
-      <div className="relative w-[150px] h-[150px]">
+      <div className="relative w-[120px] h-[120px] sm:w-[150px] sm:h-[150px]">
         {/* Center Text */}
         <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-          <p className="font-['Inter:Bold',_sans-serif] font-bold mb-0 text-[20px] text-white">${totalValue}</p>
-          <p className="font-['Inter:Medium',_sans-serif] font-medium text-[10px] text-[#72c689]">{percentageChange}</p>
+          <p className="font-['Inter:Bold',_sans-serif] font-bold mb-0 text-[16px] sm:text-[20px] text-white">${totalValue}</p>
+          <p className="font-['Inter:Medium',_sans-serif] font-medium text-[8px] sm:text-[10px] text-[#72c689]">{percentageChange}</p>
         </div>
         
         {/* Multi-segment Donut Chart */}
@@ -239,7 +239,7 @@ const BalanceCard = ({ balanceData, isLoading = false }) => {
 
       {/* Main Balance Card */}
       <div className="relative w-[265px] bg-[#1a1c1e] rounded-3xl border border-[#1a1c1e] shadow-[3px_4px_4px_-2px_rgba(211,255,202,0.25)]">
-        <div className="flex flex-col justify-start overflow-clip pb-0 px-0 relative w-[265px]">
+        <div className="flex flex-col justify-start overflow-clip pb-0 px-0 relative w-full">
           {/* Token List */}
           {allTokens.map((token, index) => {
             const originalPercentage = totalValueUsdWithAllTokens > 0 ? ((token.usdValue / totalValueUsdWithAllTokens) * 100).toFixed(1) : '0.0';
@@ -249,24 +249,24 @@ const BalanceCard = ({ balanceData, isLoading = false }) => {
               <div key={index}>
                 {/* Token Row */}
                 <div className="flex h-[70px] items-center justify-between overflow-clip p-6 relative shrink-0 w-full">
-                  <div className="flex gap-3 items-center justify-start relative shrink-0">
-                    <div className="flex items-center justify-center">
+                  <div className="flex gap-3 items-center justify-start relative shrink-0 min-w-0 flex-1">
+                    <div className="flex items-center justify-center flex-shrink-0">
                       <div className="flex items-center justify-center relative rounded-full">
                         <div 
-                          className="w-4 h-4 rounded-full flex items-center justify-center" 
+                          className="w-3 h-3 sm:w-4 sm:h-4 rounded-full flex items-center justify-center" 
                           style={{ backgroundColor: tokenColor }}
                         >
                           {/* <span className="text-white font-bold text-md leading-[20px]">{token.symbol.charAt(0)}</span> */}
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-col gap-0.5 items-start justify-start leading-[0] not-italic relative shrink-0">
-                      <span className="font-['Inter:Medium',_sans-serif] font-medium text-[#ffffff] text-md leading-[24px]">{token.symbol}</span>
-                      <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#707173] text-xs leading-[16px]">{token.amount} tokens</span>
+                    <div className="flex flex-col gap-0.5 items-start justify-start leading-[0] not-italic relative shrink-0 min-w-0">
+                      <span className="font-['Inter:Medium',_sans-serif] font-medium text-[#ffffff] text-sm sm:text-md leading-[20px] sm:leading-[24px] truncate">{token.symbol}</span>
+                      <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#707173] text-xs leading-[16px] truncate">{token.amount} tokens</span>
                     </div>
                   </div>
                   <div className="flex flex-col gap-0.5 items-end justify-center leading-[0] not-italic relative shrink-0 text-right">
-                    <span className="font-['Inter:Medium',_sans-serif] font-medium text-[#ffffff] text-md leading-[24px]">${token.usdValue.toFixed(2)}</span>
+                    <span className="font-['Inter:Medium',_sans-serif] font-medium text-[#ffffff] text-sm sm:text-md leading-[20px] sm:leading-[24px]">${token.usdValue.toFixed(2)}</span>
                     <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#707173] text-xs leading-[16px]">{originalPercentage}%</span>
                   </div>
                 </div>
@@ -283,7 +283,7 @@ const BalanceCard = ({ balanceData, isLoading = false }) => {
           
           {/* Show message if no tokens */}
           {allTokens.length === 0 && (
-            <div className="flex h-[70px] items-center justify-center overflow-clip p-6 relative shrink-0 w-full">
+            <div className="flex h-[60px] sm:h-[70px] items-center justify-center overflow-clip p-4 sm:p-6 relative shrink-0 w-full">
               <span className="font-['Inter:Regular',_sans-serif] font-normal text-[#707173] text-[14px] leading-[20px]">No tokens found</span>
             </div>
           )}

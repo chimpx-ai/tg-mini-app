@@ -166,10 +166,10 @@ const TransactionCard = ({
   };
 
   return (
-    <div className="flex flex-col items-center w-full max-w-[267px] mx-auto">
+    <div className="flex flex-col items-center w-full max-w-[300px] mx-auto px-2 sm:px-4">
       {/* Main Swap Card */}
-      <div className="relative w-[265px] h-[205px] bg-[#1a1c1e] rounded-3xl border border-[#1a1c1e] shadow-[3px_4px_4px_-2px_rgba(211,255,202,0.25)]">
-        <div className="flex flex-col h-[205px] items-center justify-start overflow-clip pb-0 pt-4 px-0 relative w-[265px]">
+      <div className="relative w-full max-w-[280px] sm:max-w-[265px] h-[205px] bg-[#1a1c1e] rounded-3xl border border-[#1a1c1e] shadow-[3px_4px_4px_-2px_rgba(211,255,202,0.25)]">
+        <div className="flex flex-col h-[205px] items-center justify-start overflow-clip pb-0 pt-4 px-0 relative w-full">
           
           {/* Header with Swap title and balance */}
           <div className="flex items-center justify-between px-6 py-0 relative shrink-0 w-full">

@@ -15,13 +15,13 @@ const MessageCard = ({ text, sender, messageType, missingParams }) => {
       )}
 
       {/* Message Card */}
-      <div className={`max-w-[70%] ${
+      <div className={`max-w-[85%] sm:max-w-[70%] ${
         sender === "user"
           ? "bg-[#1e8148] text-white rounded-[18px] shadow-[0px_3px_3px_0px_rgba(95,143,95,0.61)]"
           : "bg-[#1a1c1e] text-white rounded-[18px] shadow-[0px_3px_3px_0px_rgba(95,143,95,0.61)]"
       }`}>
         <div className="px-4 py-3">
-          <p className="font-['Inter:Regular',_sans-serif] font-normal text-left leading-[19px]">{text}</p>
+          <p className="font-['Inter:Regular',_sans-serif] font-normal text-left leading-[17px] sm:leading-[19px] text-sm sm:text-base break-words">{text}</p>
         </div>
       </div>
 

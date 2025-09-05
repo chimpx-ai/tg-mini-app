@@ -92,9 +92,9 @@ const Header = () => {
   ];
 
   return (
-    <div className="flex items-center justify-between py-4 flex-shrink-0 mx-4">
-      <img src={chimpLogo} alt="ChimpX Swap" className="h-10" />
-      <div className="flex items-center gap-2">
+    <div className="flex items-center justify-between py-4 flex-shrink-0 px-3 sm:px-4">
+      <img src={chimpLogo} alt="ChimpX Swap" className="h-9 sm:h-10 flex-shrink-0" />
+      <div className="flex items-center gap-1 sm:gap-2 min-w-0 flex-1 justify-end">
         {/* Hidden TonConnectButton for connection functionality */}
         <div className="hidden">
           <TonConnectButton />
@@ -105,8 +105,8 @@ const Header = () => {
             option.action();
           }
         }}>
-          <SelectTrigger className="w-auto min-w-[120px] h-10 bg-[#0E1711] rounded-full border-none px-3">
-            <div className="text-white text-sm">
+          <SelectTrigger className="w-auto min-w-[100px] sm:min-w-[120px] max-w-[120px] sm:max-w-[140px] h-7 sm:h-10 bg-[#0E1711] rounded-full border-none px-3">
+            <div className="text-white text-xs sm:text-sm truncate">
               {formatAddress(userFriendlyAddress)}
             </div>
           </SelectTrigger>

@@ -394,7 +394,7 @@ function Home() {
   };
 
   return (
-    <div className="relative size-full h-screen flex text-white bg-gradient-radial from-[rgba(25,77,40,1)] via-[rgba(23,57,33,1)] to-[rgba(22,36,26,1)]">
+    <div className="relative size-full h-screen flex text-white bg-gradient-radial from-[rgba(25,77,40,1)] via-[rgba(23,57,33,1)] to-[rgba(22,36,26,1)] overflow-x-hidden">
       {/* Chat Sidebar - Only show when wallet is connected */}
       {/* {userFriendlyAddress && (
         <ChatSidebar
