@@ -55,17 +55,17 @@ const TransactionCard = ({
 
   // Extract data from transaction object
   const quote = transaction?.quote || transaction;
-  const fromAsset = quote?.data?.fromAssetInfo;
-  const toAsset = quote?.data?.toAssetInfo;
-  const simulateSwap = quote?.data?.simulateSwapResponse;
+  const fromAsset = transaction?.fromAsset || quote?.data?.fromAssetInfo;
+  const toAsset = transaction?.toAsset || quote?.data?.toAssetInfo;
+  const simulateSwap = transaction?.simulateSwap || quote?.data?.simulateSwapResponse;
   
   // Fallback values if data is not available
   const fromToken = fromAsset?.meta?.symbol || quote?.fromToken || 'TON';
   const toToken = toAsset?.meta?.symbol || quote?.toToken || 'STON';
-  const fromAmount = parseFloat(quote?.amountIn || simulateSwap?.formattedOutputAmount || '0').toFixed(2);
-  const toAmount = parseFloat(quote?.amountOut || simulateSwap?.formattedOutputAmount || '0').toFixed(2);
-  const fromAmountUsd = (parseFloat(quote?.amountIn || simulateSwap?.formattedOutputAmount || '0') * parseFloat(fromAsset?.dexPriceUsd || '0')).toFixed(2);
-  const toAmountUsd = parseFloat(simulateSwap?.formattedOutputAmountUsd || (parseFloat(quote?.amountOut || simulateSwap?.formattedOutputAmount || '0') * parseFloat(toAsset?.dexPriceUsd || '0'))).toFixed(2);
+  const fromAmount = parseFloat(quote?.amountIn || '0').toFixed(6);
+  const toAmount = parseFloat(quote?.amountOut || '0').toFixed(6);
+  const fromAmountUsd = (parseFloat(quote?.amountIn || '0') * parseFloat(fromAsset?.dexPriceUsd || '0')).toFixed(2);
+  const toAmountUsd = parseFloat(simulateSwap?.formattedOutputAmountUsd || (parseFloat(quote?.amountOut || '0') * parseFloat(toAsset?.dexPriceUsd || '0'))).toFixed(2);
 
   const confirmTransaction = async (transaction) => {
     try {
@@ -78,21 +78,22 @@ const TransactionCard = ({
       }
       console.log("transaction", transaction);
       const routerMetadata =
+        transaction.simulateSwap?.routerMetadata ||
         transaction.quote?.data?.simulateSwapResponse?.routerMetadata || 
         transaction.data?.simulateSwapResponse?.routerMetadata;
       const dexContracts = dexFactory(routerMetadata);
       const router = tonApiClient.open(
         dexContracts.Router.create(routerMetadata.address)
       );
-      const simulateSwapData = transaction.quote?.data?.simulateSwapResponse || transaction.data?.simulateSwapResponse;
+      const simulateSwapData = transaction.simulateSwap || transaction.quote?.data?.simulateSwapResponse || transaction.data?.simulateSwapResponse;
       const sharedTxParams = {
         userWalletAddress: userFriendlyAddress,
         offerAmount: simulateSwapData.offerUnits,
         minAskAmount: simulateSwapData.minAskUnits,
       };
       let swapParams;
-      const fromAssetInfo = transaction.quote?.data?.fromAssetInfo || transaction.data?.fromAssetInfo;
-      const toAssetInfo = transaction.quote?.data?.toAssetInfo || transaction.data?.toAssetInfo;
+      const fromAssetInfo = transaction.fromAsset || transaction.quote?.data?.fromAssetInfo || transaction.data?.fromAssetInfo;
+      const toAssetInfo = transaction.toAsset || transaction.quote?.data?.toAssetInfo || transaction.data?.toAssetInfo;
       
       if (fromAssetInfo.kind === "Ton") {
         swapParams = await router.getSwapTonToJettonTxParams({
@@ -199,7 +200,7 @@ const TransactionCard = ({
               <div className="flex items-end justify-end pl-0 pr-3 py-0 relative shrink-0">
                 <div className="mr-[-12px] relative rounded-[100px] shrink-0 size-9">
                   {fromAsset?.meta?.imageUrl ? (
-                    <img src={fromAsset.meta.imageUrl} alt={fromToken} className="w-9 h-9 rounded-full" />
+                    <img src={fromAsset.meta.imageUrl.replace(/[`\s]/g, '')} alt={fromToken} className="w-9 h-9 rounded-full" />
                   ) : (
                     <div className="w-9 h-9 bg-[#FF007A] rounded-full flex items-center justify-center">
                       <span className="text-white font-bold text-[14px] leading-[20px]">{fromToken?.charAt(0) || 'T'}</span>
@@ -229,7 +230,7 @@ const TransactionCard = ({
               <div className="flex items-end justify-end pl-0 pr-3 py-0 relative shrink-0">
                 <div className="mr-[-12px] relative rounded-[100px] shrink-0 size-9">
                   {toAsset?.meta?.imageUrl ? (
-                    <img src={toAsset.meta.imageUrl} alt={toToken} className="w-9 h-9 rounded-full" />
+                    <img src={toAsset.meta.imageUrl.replace(/[`\s]/g, '')} alt={toToken} className="w-9 h-9 rounded-full" />
                   ) : (
                     <div className="w-9 h-9 bg-[#FF007A] rounded-full flex items-center justify-center">
                       <span className="text-white font-bold text-[14px] leading-[20px]">{toToken?.charAt(0) || 'S'}</span>

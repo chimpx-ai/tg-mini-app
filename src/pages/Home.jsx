@@ -7,12 +7,13 @@ import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
 import ChatSidebar from "../components/ChatSidebar";
 import ChatStorage from "../utils/chatStorage";
+import mcpClient from "../services/mcpClient";
 // import { useActionHandler } from "../hooks/useActionHandler";
 
 function Home() {
   const userFriendlyAddress = useTonAddress();
   const navigate = useNavigate();
-  const { data: walletData, isLoading: walletDataLoading, refetch: refetchWalletData } = useWalletData(userFriendlyAddress);
+  const { refetch: refetchWalletData } = useWalletData(userFriendlyAddress);
   // const [logs, setLogs] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -20,7 +21,6 @@ function Home() {
   const [currentChatId, setCurrentChatId] = useState(null);
   const [, setChatHistory] = useState([]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [sessionId, setSessionId] = useState(null);
   const [conversationId, setConversationId] = useState(null);
   const [conversationContext, setConversationContext] = useState(null);
 
@@ -67,127 +67,102 @@ function Home() {
     const currentInput = messageToSend;
   
     try {
-      const requestBody = {
-        prompt: currentInput,
-        ...(sessionId && { sessionId }),
-        ...(conversationId && { conversationId }),
-        ...(userFriendlyAddress && { walletAddress: userFriendlyAddress }),
-        userId: userFriendlyAddress || 'anonymous',
-        isFollowUp: !!conversationId
-      };
+      // Use MCP client instead of direct API call
+      const mcpResponse = await mcpClient.processMessage(
+        currentInput,
+        userFriendlyAddress,
+        conversationId
+      );
       
-      const response = await fetch("https://chimpxtonapi.chimpx.ai/process", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
-      });
-      const resp = await response.json();
-      console.log("resp", resp);
+      console.log("MCP response", mcpResponse);
       
-      // Store sessionId and conversationId for conversation continuity
-      if (resp.sessionId) {
-        setSessionId(resp.sessionId);
+      if (!mcpResponse.success) {
+        throw new Error(mcpResponse.error?.message || 'Failed to process message');
       }
+      
+      const resp = mcpResponse.data;
+      
+      // Store conversationId for conversation continuity
       if (resp.conversationId) {
         setConversationId(resp.conversationId);
       }
       
-      // Handle different response types
+      // Handle different response types from MCP client
       let botMessage;
       
-      if (resp.action === 'clarification') {
-        // Handle clarification response
-        setConversationContext(resp.context);
+      if (resp.type === 'quote') {
+        // Handle swap quote data
         botMessage = {
           id: Date.now() + 1,
-          text: resp.message,
+          text: resp.response || "Check Details for the swap transaction",
           sender: "bot",
           timestamp: new Date().toLocaleTimeString(),
-          messageType: 'clarification',
-          missingParams: resp.missingParams || [],
-          context: resp.context
+          transaction: resp.transaction,
+          actionType: 'swap',
+          transactionState: 'idle',
+          errorMessage: null,
+          transactionHash: null,
+          swapCompleted: false
         };
-      } else if (resp.action === 'quote' || resp.action === 'swap') {
-        // Handle transaction/swap data
-        const isTransaction = resp && (resp.quote || resp.data?.simulateSwapResponse || resp.action === 'swap');
-        botMessage = {
-          id: Date.now() + 1,
-          text: isTransaction ? "Check Details for the swap transaction" : (resp.message || resp.reasoning || "Here's the information you requested"),
-          sender: "bot",
-          timestamp: new Date().toLocaleTimeString(),
-          ...(isTransaction && {
-            transaction: resp,
-            actionType: 'swap',
-            transactionState: 'idle',
-            errorMessage: null,
-            transactionHash: null,
-            swapCompleted: false
-          })
-        };
-      } else if (resp.action === 'stakeQuote') {
+      } else if (resp.type === 'stake') {
         // Handle stake quote data
         botMessage = {
           id: Date.now() + 1,
-          text: "Here's your staking transaction:",
+          text: resp.response || "Here's your staking transaction:",
           sender: "bot",
           timestamp: new Date().toLocaleTimeString(),
           transaction: {
             type: 'stake',
-            amount: resp.stakeQuote?.amount || '0',
-            apy: resp.stakeQuote?.apy || '8.5',
-            estimatedRewards: resp.stakeQuote?.estimatedRewards || '0',
-            stakingFee: resp.stakeQuote?.stakingFee || '0',
-            estimatedOutput: resp.stakeQuote?.estimatedOutput || '0',
-            description: resp.stakeQuote?.description || ''
+            ...resp.quote
           },
           transactionState: 'idle',
           errorMessage: null,
           transactionHash: null
         };
-      } else if (resp.action === 'unstakeQuote') {
+      } else if (resp.type === 'unstake') {
         // Handle unstake quote data
         botMessage = {
           id: Date.now() + 1,
-          text: "Here's your unstaking transaction:",
+          text: resp.response || "Here's your unstaking transaction:",
           sender: "bot",
           timestamp: new Date().toLocaleTimeString(),
           transaction: {
             type: 'unstake',
-            amount: resp.unstakeQuote?.amount || '0',
-            unstakeType: resp.unstakeQuote?.unstakeType || 'instant',
-            fee: resp.unstakeQuote?.unstakingFee || '0',
-            netAmount: resp.unstakeQuote?.estimatedOutput || '0',
-            estimatedReceive: resp.unstakeQuote?.estimatedOutput || '0',
-            processingTime: resp.unstakeQuote?.estimatedTime || '48-72 hours',
-            description: resp.unstakeQuote?.description || ''
+            ...resp.quote
           },
           transactionState: 'idle',
           errorMessage: null,
           transactionHash: null
         };
-      } else if (resp.action === 'balances') {
-        // Handle balance/portfolio data
-        botMessage = {
-          id: Date.now() + 1,
-          text: "Here's your wallet balance:",
-          sender: "bot",
-          timestamp: new Date().toLocaleTimeString(),
-          balanceData: resp.balances
+      } else if (resp.type === 'balance') {
+        // Handle balance/portfolio data - transform MCP response to BalanceCard format
+        const transformedBalanceData = {
+          ton: resp.balances?.[0] || {},
+          jettons: resp.balances?.[1]?.balances || []
         };
-      } else if (resp.action === 'stakingInfo') {
-        // Handle staking info data
+        
         botMessage = {
           id: Date.now() + 1,
-          text: resp.stakingInfo ? `Current APY: ${resp.stakingInfo.currentApy}%\nTotal Value Locked: ${resp.stakingInfo.totalValueLocked} TON\nStakers Count: ${resp.stakingInfo.stakersCount}\nInstant Liquidity: ${resp.stakingInfo.instantLiquidity ? 'Available' : 'Not Available'}` : (resp.message || "Here's the staking information"),
+          text: resp.response || "Here's your wallet balance:",
           sender: "bot",
           timestamp: new Date().toLocaleTimeString(),
-          messageType: 'conversational'
+          balanceData: transformedBalanceData
+        };
+      } else if (resp.type === 'clarification') {
+        // Handle clarification requests for incomplete prompts
+        botMessage = {
+          id: Date.now() + 1,
+          text: resp.response,
+          sender: "bot",
+          timestamp: new Date().toLocaleTimeString(),
+          messageType: 'clarification',
+          clarification: resp.clarification
         };
       } else {
         // Handle conversational response
         botMessage = {
           id: Date.now() + 1,
-          text: resp.message || resp.error || resp.reasoning || "Here's the information you requested",
+          text: resp.response || "Here's the information you requested",
           sender: "bot",
           timestamp: new Date().toLocaleTimeString(),
           messageType: 'conversational'
@@ -231,6 +206,11 @@ function Home() {
     } else {
       loadChatHistory();
     }
+    
+    // Cleanup MCP client on unmount
+    return () => {
+      mcpClient.disconnect();
+    };
   }, [userFriendlyAddress, navigate]);
 
   // Load existing chats for the current wallet
@@ -255,7 +235,6 @@ function Home() {
     const newChatId = ChatStorage.createNewChat(userFriendlyAddress);
     setCurrentChatId(newChatId);
     setMessages([]);
-    setSessionId(null);
     setConversationId(null);
     setConversationContext(null);
     loadChatHistory(); // Refresh chat list

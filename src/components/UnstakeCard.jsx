@@ -48,10 +48,15 @@ const UnstakeCard = ({
     };
   }, [isLoading, transactionState]);
 
-  // Extract data from transaction object
-  const unstakeAmount = parseFloat(transaction?.amount || '0').toFixed(2);
-  const estimatedReceive = parseFloat(transaction?.estimatedReceive || '0').toFixed(2);
-  const processingTime = transaction?.processingTime || '48-72 hours';
+  // Extract data from transaction object - handle both old and new formats
+  const quote = transaction?.quote || transaction;
+  const unstakeAmount = parseFloat(quote?.amount || transaction?.amount || '0').toFixed(6);
+  const estimatedReceive = parseFloat(quote?.estimatedOutput || transaction?.estimatedReceive || '0').toFixed(6);
+  const processingTime = quote?.estimatedTime || transaction?.processingTime || '48-72 hours';
+  
+  // Token image URLs
+  const stTonImageUrl = 'https://asset.ston.fi/img/EQDNhy-nxYFgUqzfUzImBEP67JqsyMIcyk2S5_RwNNEYku0k/ee9fb21d17bc8d75c2a5f7b5f5f62d2bacec6b128f58b63cb841e98f7b74c4fc';
+  const tonImageUrl = 'https://asset.ston.fi/img/EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c/ee9fb21d17bc8d75c2a5f7b5f5f62d2bacec6b128f58b63cb841e98f7b74c4fc';
 
   const confirmTransaction = async (transaction) => {
     try {
@@ -168,9 +173,7 @@ const UnstakeCard = ({
             <div className="flex gap-3.5 items-center justify-start relative shrink-0">
               <div className="flex items-end justify-end pl-0 pr-3 py-0 relative shrink-0">
                 <div className="mr-[-12px] relative rounded-[100px] shrink-0 size-9">
-                  <div className="w-9 h-9 bg-[#00D4AA] rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-[12px] leading-[16px]">tsTON</span>
-                  </div>
+                  <img src={stTonImageUrl} alt="stTON" className="w-9 h-9 rounded-full" />
                 </div>
               </div>
               <div className="flex flex-col gap-1 items-start justify-start leading-[0] not-italic relative shrink-0">
@@ -194,9 +197,7 @@ const UnstakeCard = ({
             <div className="flex gap-3.5 items-center justify-start relative shrink-0">
               <div className="flex items-end justify-end pl-0 pr-3 py-0 relative shrink-0">
                 <div className="mr-[-12px] relative rounded-[100px] shrink-0 size-9">
-                  <div className="w-9 h-9 bg-[#0088CC] rounded-full flex items-center justify-center">
-                    <TrendingDown size={16} className="text-white" />
-                  </div>
+                  <img src={tonImageUrl} alt="TON" className="w-9 h-9 rounded-full" />
                 </div>
               </div>
               <div className="flex flex-col gap-1 items-start justify-start leading-[0] not-italic relative shrink-0">

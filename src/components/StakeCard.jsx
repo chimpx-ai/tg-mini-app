@@ -48,10 +48,14 @@ const StakeCard = ({
     };
   }, [isLoading, transactionState]);
 
-  // Extract data from transaction object
-  const stakeAmount = parseFloat(transaction?.amount || '0').toFixed(2);
-  const estimatedRewards = parseFloat(transaction?.estimatedRewards || '0').toFixed(2);
-  const apy = transaction?.apy || '8.5';
+  // Extract data from transaction object - handle both old and new formats
+  const quote = transaction?.quote || transaction;
+  const stakeAmount = parseFloat(quote?.amount || transaction?.amount || '0').toFixed(6);
+  const estimatedRewards = parseFloat(quote?.estimatedRewards || transaction?.estimatedRewards || '0').toFixed(6);
+  const apy = quote?.apy || transaction?.apy || '8.5';
+  
+  // Token image URL for TON
+  const tonImageUrl = 'https://asset.ston.fi/img/EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c/ee9fb21d17bc8d75c2a5f7b5f5f62d2bacec6b128f58b63cb841e98f7b74c4fc';
 
   const confirmTransaction = async (transaction) => {
     try {
@@ -168,9 +172,7 @@ const StakeCard = ({
             <div className="flex gap-3.5 items-center justify-start relative shrink-0">
               <div className="flex items-end justify-end pl-0 pr-3 py-0 relative shrink-0">
                 <div className="mr-[-12px] relative rounded-[100px] shrink-0 size-9">
-                  <div className="w-9 h-9 bg-[#0088CC] rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-[14px] leading-[20px]">TON</span>
-                  </div>
+                  <img src={tonImageUrl} alt="TON" className="w-9 h-9 rounded-full" />
                 </div>
               </div>
               <div className="flex flex-col gap-1 items-start justify-start leading-[0] not-italic relative shrink-0">
