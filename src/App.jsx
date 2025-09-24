@@ -5,13 +5,11 @@ import "./App.css";
 
 function App() {
   return (
-    <div className="App min-h-screen">
-      <div className="w-full mx-auto h-screen">
+    <div className="min-h-screen">
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/home" element={<Home />} />
         </Routes>
-      </div>
     </div>
   );
 }

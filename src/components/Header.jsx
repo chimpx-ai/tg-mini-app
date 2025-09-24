@@ -92,7 +92,7 @@ const Header = () => {
   ];
 
   return (
-    <div className="flex items-center justify-between py-4 flex-shrink-0 px-3 sm:px-4">
+    <div className="flex items-center justify-between py-2 sm:py-4 flex-shrink-0 px-3 sm:px-4">
       <img src={chimpLogo} alt="ChimpX Swap" className="h-9 sm:h-10 flex-shrink-0" />
       <div className="flex items-center gap-1 sm:gap-2 min-w-0 flex-1 justify-end">
         {/* Hidden TonConnectButton for connection functionality */}

@@ -155,12 +155,12 @@ const MessageInput = ({
         {/* Message Input Field */}
         <div className="flex flex-row gap-2 sm:gap-2 justify-start items-center w-full h-12 bg-[#0E1711] text-white rounded-lg border border-gray-700 px-1">
           <Select onValueChange={handleSelectOption} value={selectedOption}>
-            <SelectTrigger className="w-[100px] sm:w-[100px] h-8 bg-transparent border border-[#383838] text-white hover:bg-gray-800 rounded-md px-1 sm:px-2">
-              <div className="flex items-center gap-1">
+            <SelectTrigger className="max-w-fit sm:w-[140px] h-8 bg-transparent border border-[#383838] text-white hover:bg-gray-800 rounded-md px-1 sm:px-2">
+              <div className="flex items-center gap-1 px-1">
                 {(() => {
                   const currentOption = SELECT_OPTIONS.find(option => option.value === selectedOption);
                   const IconComponent = currentOption?.icon || RefreshCw;
-                  return <IconComponent className="size-3 text-white" />;
+                  return <IconComponent className="size-4 text-white" />;
                 })()}
                 <span className="text-white text-xs sm:text-sm">
                   {SELECT_OPTIONS.find(option => option.value === selectedOption)?.label || "Swap"}
@@ -215,7 +215,7 @@ const MessageInput = ({
         </button>
       </div>
       {/* Quick Actions scrollable list */}
-      <ScrollArea className="w-[calc(100vw-20px)] h-10 sm:h-12" orientation="horizontal">
+      <ScrollArea className="w-[calc(100vw-24px)] sm:w-full h-10 sm:h-12" orientation="horizontal">
         <div
           className="flex flex-row gap-1 sm:gap-2 justify-start items-center pb-2"
           style={{ minWidth: "max-content" }}

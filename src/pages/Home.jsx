@@ -373,7 +373,7 @@ function Home() {
   };
 
   return (
-    <div className="relative size-full h-screen flex text-white bg-gradient-radial from-[rgba(25,77,40,1)] via-[rgba(23,57,33,1)] to-[rgba(22,36,26,1)] overflow-x-hidden">
+    <div className="text-white h-screen flex ">
       {/* Chat Sidebar - Only show when wallet is connected */}
       {/* {userFriendlyAddress && (
         <ChatSidebar
@@ -388,7 +388,7 @@ function Home() {
       )} */}
       
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex flex-col">
         <Header />
 
         {/* Chat Area - Only show when wallet is connected */}
