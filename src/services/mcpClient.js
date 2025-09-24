@@ -1,5 +1,5 @@
 class MCPClient {
-  constructor(baseUrl = 'http://localhost:3001') {
+  constructor(baseUrl = 'https://chimpxtonapi.chimpx.ai') {
     this.baseUrl = baseUrl;
     this.isConnected = false;
     this.sessionId = null;
