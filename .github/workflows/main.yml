@@ -31,8 +31,8 @@ jobs:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
-          source: "build/*"
-          target: "/home/${{ secrets.VM_USER }}/build"
+          source: "dist/*"
+          target: "/home/${{ secrets.VM_USER }}/ton/dist"
 
       # 🔹 SSH into VM and deploy
       - name: Deploy to Nginx
@@ -43,5 +43,5 @@ jobs:
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
             sudo rm -rf /var/www/ton/*
-            sudo cp -r /home/${{ secrets.VM_USER }}/build/* /var/www/ton/
+            sudo cp -r /home/${{ secrets.VM_USER }}/ton/dist/* /var/www/ton/
             sudo systemctl restart nginx
