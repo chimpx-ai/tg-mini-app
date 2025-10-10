@@ -1,9 +1,9 @@
 {
-  "url": "https://chimpxtg.netlify.app",
+  "url": "https://ton.chimpx.ai",
   "name": "ChimpX AI",
-  "iconUrl": "https://chimpxtg.netlify.app/icon.png",
-  "termsOfUseUrl": "https://chimpxtg.netlify.app/terms",
-  "privacyPolicyUrl": "https://chimpxtg.netlify.app/privacy",
+  "iconUrl": "https://ton.chimpx.ai/icon.png",
+  "termsOfUseUrl": "https://ton.chimpx.ai/terms",
+  "privacyPolicyUrl": "https://ton.chimpx.ai/privacy",
   "manifestVersion": "1.0",
   "bridgeUrl": "https://bridge.tonapi.io/bridge"
 }

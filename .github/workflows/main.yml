@@ -1,0 +1,47 @@
+name: Deploy React App to GCP VM with Yarn
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build React app
+        run: yarn build
+
+      # 🔹 Upload build folder to VM
+      - name: Upload build folder to VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          source: "build/*"
+          target: "/home/${{ secrets.VM_USER }}/build"
+
+      # 🔹 SSH into VM and deploy
+      - name: Deploy to Nginx
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            sudo rm -rf /var/www/ton/*
+            sudo cp -r /home/${{ secrets.VM_USER }}/build/* /var/www/ton/
+            sudo systemctl restart nginx

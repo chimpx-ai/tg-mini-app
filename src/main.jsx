@@ -17,7 +17,7 @@ const queryClient = new QueryClient({
 });
 
 const appUr =
-  "https://chimpxtg.netlify.app";
+  "https://ton.chimpx.ai";
 const manifestUrl = `${appUr}/tonconnect-manifest.json`;
 console.log("manifestUrl", manifestUrl);
 createRoot(document.getElementById("root")).render(
