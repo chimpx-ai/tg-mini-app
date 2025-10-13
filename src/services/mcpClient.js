@@ -1,5 +1,5 @@
 class MCPClient {
-  constructor(baseUrl = 'https://chimpxtonapi.chimpx.ai') {
+  constructor(baseUrl = "https://tonapi.chimpx.ai") {
     this.baseUrl = baseUrl;
     this.isConnected = false;
     this.sessionId = null;
@@ -11,49 +11,58 @@ class MCPClient {
   async initialize(walletAddress, retryCount = 0) {
     const maxRetries = 3;
     const retryDelay = 1000 * Math.pow(2, retryCount); // Exponential backoff
-    
+
     try {
       this.sessionId = this.generateSessionId();
-      
+
       // Initialize MCP session
-      const initResponse = await this.sendMCPRequest({
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'initialize',
-        params: {
-          protocolVersion: '2024-11-05',
-          capabilities: {
-            tools: {},
-          },
-          clientInfo: {
-            name: 'chimpx-frontend',
-            version: '1.0.0',
+      const initResponse = await this.sendMCPRequest(
+        {
+          jsonrpc: "2.0",
+          id: 1,
+          method: "initialize",
+          params: {
+            protocolVersion: "2024-11-05",
+            capabilities: {
+              tools: {},
+            },
+            clientInfo: {
+              name: "chimpx-frontend",
+              version: "1.0.0",
+            },
           },
         },
-      }, walletAddress);
+        walletAddress
+      );
 
       if (initResponse.result) {
-        console.log('MCP initialized successfully:', initResponse.result);
+        console.log("MCP initialized successfully:", initResponse.result);
         this.isConnected = true;
-        
+
         // Set up SSE connection for real-time updates
         this.setupSSEConnection();
-        
+
         return true;
       }
-      
-      throw new Error('Failed to initialize MCP connection');
+
+      throw new Error("Failed to initialize MCP connection");
     } catch (error) {
-      console.error(`MCP initialization failed (attempt ${retryCount + 1}):`, error);
-      
+      console.error(
+        `MCP initialization failed (attempt ${retryCount + 1}):`,
+        error
+      );
+
       if (retryCount < maxRetries) {
         console.log(`Retrying in ${retryDelay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, retryDelay));
+        await new Promise((resolve) => setTimeout(resolve, retryDelay));
         return this.initialize(walletAddress, retryCount + 1);
       }
-      
+
       this.isConnected = false;
-      this.notifyHandlers('connection_failed', { error: error.message, retries: retryCount });
+      this.notifyHandlers("connection_failed", {
+        error: error.message,
+        retries: retryCount,
+      });
       return false;
     }
   }
@@ -68,7 +77,7 @@ class MCPClient {
     this.eventSource = new EventSource(sseUrl);
 
     this.eventSource.onopen = () => {
-      console.log('SSE connection established');
+      console.log("SSE connection established");
     };
 
     this.eventSource.onmessage = (event) => {
@@ -76,29 +85,29 @@ class MCPClient {
         const data = JSON.parse(event.data);
         this.handleSSEMessage(event.type, data);
       } catch (error) {
-        console.error('Error parsing SSE message:', error);
+        console.error("Error parsing SSE message:", error);
       }
     };
 
-    this.eventSource.addEventListener('connected', (event) => {
+    this.eventSource.addEventListener("connected", (event) => {
       const data = JSON.parse(event.data);
-      console.log('SSE connected:', data);
+      console.log("SSE connected:", data);
     });
 
-    this.eventSource.addEventListener('tool_execution', (event) => {
+    this.eventSource.addEventListener("tool_execution", (event) => {
       const data = JSON.parse(event.data);
-      console.log('Tool execution update:', data);
-      this.notifyHandlers('tool_execution', data);
+      console.log("Tool execution update:", data);
+      this.notifyHandlers("tool_execution", data);
     });
 
-    this.eventSource.addEventListener('tool_error', (event) => {
+    this.eventSource.addEventListener("tool_error", (event) => {
       const data = JSON.parse(event.data);
-      console.error('Tool execution error:', data);
-      this.notifyHandlers('tool_error', data);
+      console.error("Tool execution error:", data);
+      this.notifyHandlers("tool_error", data);
     });
 
     this.eventSource.onerror = (error) => {
-      console.error('SSE connection error:', error);
+      console.error("SSE connection error:", error);
       // Attempt to reconnect after a delay
       setTimeout(() => {
         if (this.isConnected) {
@@ -112,9 +121,9 @@ class MCPClient {
   async sendMCPRequest(request, walletAddress) {
     try {
       const response = await fetch(`${this.baseUrl}/mcp`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           sessionId: this.sessionId,
@@ -129,7 +138,7 @@ class MCPClient {
 
       return await response.json();
     } catch (error) {
-      console.error('MCP request failed:', error);
+      console.error("MCP request failed:", error);
       throw error;
     }
   }
@@ -139,21 +148,23 @@ class MCPClient {
     try {
       // Analyze message to determine tools and clarifications
       const { tools, clarifications } = this.analyzeMessageForTools(message);
-      
+
       // If there are clarifications needed, return them immediately
       if (clarifications.length > 0) {
         return {
           success: true,
           data: {
             response: clarifications[0].message,
-            conversationId: conversationId || `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            conversationId:
+              conversationId ||
+              `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             sessionId: this.sessionId,
-            type: 'clarification',
-            clarification: clarifications[0]
-          }
+            type: "clarification",
+            clarification: clarifications[0],
+          },
         };
       }
-      
+
       const requestData = {
         message,
         conversationId,
@@ -161,12 +172,12 @@ class MCPClient {
         tools: tools.length > 0 ? tools : undefined,
       };
 
-      console.log('Sending MCP request:', requestData);
+      console.log("Sending MCP request:", requestData);
 
       const response = await fetch(`${this.baseUrl}/mcp`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(requestData),
       });
@@ -176,10 +187,10 @@ class MCPClient {
       }
 
       const data = await response.json();
-      console.log('MCP response:', data);
+      console.log("MCP response:", data);
       return data;
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error("Error sending message:", error);
       throw error;
     }
   }
@@ -191,46 +202,53 @@ class MCPClient {
       if (!this.isConnected) {
         const initialized = await this.initialize(walletAddress);
         if (!initialized) {
-          return this.getFallbackResponse(message, conversationId, 'Connection failed');
+          return this.getFallbackResponse(
+            message,
+            conversationId,
+            "Connection failed"
+          );
         }
       }
 
       // Send user message directly to Claude via MCP for natural language processing
       // This follows the Claude Desktop pattern where LLM decides tool usage
       const chatResponse = await Promise.race([
-        this.sendMCPRequest({
-          jsonrpc: '2.0',
-          id: Date.now(),
-          method: 'completion/complete',
-          params: {
-            prompt: {
-              messages: [
-                {
-                  role: 'user',
-                  content: {
-                    type: 'text',
-                    text: message
-                  }
-                }
-              ]
+        this.sendMCPRequest(
+          {
+            jsonrpc: "2.0",
+            id: Date.now(),
+            method: "completion/complete",
+            params: {
+              prompt: {
+                messages: [
+                  {
+                    role: "user",
+                    content: {
+                      type: "text",
+                      text: message,
+                    },
+                  },
+                ],
+              },
+              includeContext: "thisServer",
             },
-            includeContext: 'thisServer'
-          }
-        }, walletAddress),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Chat completion timeout')), 30000)
-        )
+          },
+          walletAddress
+        ),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Chat completion timeout")), 30000)
+        ),
       ]);
 
-      console.log('Claude response:', chatResponse);
+      console.log("Claude response:", chatResponse);
 
       // Handle structured response from backend
-      const responseType = chatResponse.result?.type || 'text';
+      const responseType = chatResponse.result?.type || "text";
       const transaction = chatResponse.result?.transaction;
-      
+
       // Format response based on type
       switch (responseType) {
-        case 'swap':
+        case "swap":
           if (transaction) {
             // Format transaction for TransactionCard compatibility
             const formattedTransaction = {
@@ -242,67 +260,75 @@ class MCPClient {
                 priceImpact: transaction.priceImpact,
                 route: transaction.route,
                 gasEstimate: transaction.gasEstimate,
-                slippage: transaction.slippage
+                slippage: transaction.slippage,
               },
               fromAsset: transaction.fromAsset,
               toAsset: transaction.toAsset,
-              simulateSwap: transaction.simulateSwap
+              simulateSwap: transaction.simulateSwap,
             };
-            
+
             return {
               success: true,
               data: {
-                response: chatResponse.result?.content?.[0]?.text || 'Check Details for the swap transaction',
+                response:
+                  chatResponse.result?.content?.[0]?.text ||
+                  "Check Details for the swap transaction",
                 conversationId: conversationId || this.generateConversationId(),
                 sessionId: this.sessionId,
-                type: 'quote',
-                transaction: formattedTransaction
-              }
+                type: "quote",
+                transaction: formattedTransaction,
+              },
             };
           }
           break;
-          
-        case 'stake':
+
+        case "stake":
           if (transaction) {
             return {
               success: true,
               data: {
-                response: chatResponse.result?.content?.[0]?.text || 'Here\'s your staking transaction:',
+                response:
+                  chatResponse.result?.content?.[0]?.text ||
+                  "Here's your staking transaction:",
                 conversationId: conversationId || this.generateConversationId(),
                 sessionId: this.sessionId,
-                type: 'stake',
-                quote: transaction
-              }
+                type: "stake",
+                quote: transaction,
+              },
             };
           }
           break;
-          
-        case 'unstake':
+
+        case "unstake":
           if (transaction) {
             return {
               success: true,
               data: {
-                response: chatResponse.result?.content?.[0]?.text || 'Here\'s your unstaking transaction:',
+                response:
+                  chatResponse.result?.content?.[0]?.text ||
+                  "Here's your unstaking transaction:",
                 conversationId: conversationId || this.generateConversationId(),
                 sessionId: this.sessionId,
-                type: 'unstake',
-                quote: transaction
-              }
+                type: "unstake",
+                quote: transaction,
+              },
             };
           }
           break;
-          
-        case 'balance':
+
+        case "balance":
           if (transaction) {
             return {
               success: true,
               data: {
-                response: chatResponse.result?.content?.[0]?.text || 'Here\'s your wallet balance:',
+                response:
+                  chatResponse.result?.content?.[0]?.text ||
+                  "Here's your wallet balance:",
                 conversationId: conversationId || this.generateConversationId(),
                 sessionId: this.sessionId,
-                type: 'balance',
-                balances: transaction
-              }
+                type: "balance",
+                balances: transaction,
+              },
             };
           }
           break;
@@ -312,29 +338,37 @@ class MCPClient {
       return {
         success: true,
         data: {
-          response: chatResponse.result?.content?.[0]?.text || 'I apologize, but I encountered an issue processing your request.',
+          response:
+            chatResponse.result?.content?.[0]?.text ||
+            "I apologize, but I encountered an issue processing your request.",
           conversationId: conversationId || this.generateConversationId(),
           sessionId: this.sessionId,
-          type: 'text',
+          type: "text",
           toolCalls: chatResponse.result?.toolCalls || [],
-          toolResults: chatResponse.result?.toolResults || []
-        }
+          toolResults: chatResponse.result?.toolResults || [],
+        },
       };
-
     } catch (error) {
-      console.error('Error processing message:', error);
-      
+      console.error("Error processing message:", error);
+
       // If MCP fails, try fallback response
-      if (error.message.includes('timeout') || error.message.includes('fetch')) {
+      if (
+        error.message.includes("timeout") ||
+        error.message.includes("fetch")
+      ) {
         this.isConnected = false;
-        return this.getFallbackResponse(message, conversationId, 'Service temporarily unavailable');
+        return this.getFallbackResponse(
+          message,
+          conversationId,
+          "Service temporarily unavailable"
+        );
       }
-      
+
       return {
         success: false,
         error: {
           message: error.message,
-          code: 'MCP_ERROR',
+          code: "MCP_ERROR",
         },
       };
     }
@@ -342,14 +376,15 @@ class MCPClient {
 
   // Fallback response when MCP is unavailable
   getFallbackResponse(message, conversationId, reason) {
-    const fallbackText = "I'm currently experiencing connectivity issues with the AI assistant. Please try again in a moment. If the issue persists, you can perform TON blockchain operations directly through your wallet app.";
-    
+    const fallbackText =
+      "I'm currently experiencing connectivity issues with the AI assistant. Please try again in a moment. If the issue persists, you can perform TON blockchain operations directly through your wallet app.";
+
     return {
       success: true,
       data: {
         response: fallbackText,
         conversationId: conversationId || this.generateConversationId(),
-        type: 'text',
+        type: "text",
         fallback: true,
         reason,
       },
@@ -365,20 +400,21 @@ class MCPClient {
       return {
         success: true,
         data: {
-          response: "I couldn't find any specific actions to perform. Please be more specific about what you'd like to do.",
-          type: 'text',
+          response:
+            "I couldn't find any specific actions to perform. Please be more specific about what you'd like to do.",
+          type: "text",
         },
       };
     }
 
     // Handle different types of results
     for (const result of results) {
-      if (result.tool === 'getSwapQuote' && result.result) {
+      if (result.tool === "getSwapQuote" && result.result) {
         return {
           success: true,
           data: {
             response: `Here's your swap quote:`,
-            type: 'quote',
+            type: "quote",
             quote: result.result,
             conversationId: this.generateConversationId(),
             sessionId: this.sessionId,
@@ -386,12 +422,12 @@ class MCPClient {
         };
       }
 
-      if (result.tool === 'getStakeQuote' && result.result) {
+      if (result.tool === "getStakeQuote" && result.result) {
         return {
           success: true,
           data: {
             response: `Here's your staking quote:`,
-            type: 'stake',
+            type: "stake",
             quote: result.result,
             conversationId: this.generateConversationId(),
             sessionId: this.sessionId,
@@ -399,12 +435,12 @@ class MCPClient {
         };
       }
 
-      if (result.tool === 'getUnstakeQuote' && result.result) {
+      if (result.tool === "getUnstakeQuote" && result.result) {
         return {
           success: true,
           data: {
             response: `Here's your unstaking quote:`,
-            type: 'unstake',
+            type: "unstake",
             quote: result.result,
             conversationId: this.generateConversationId(),
             sessionId: this.sessionId,
@@ -412,12 +448,16 @@ class MCPClient {
         };
       }
 
-      if ((result.tool === 'getTonBalance' || result.tool === 'getJettonBalances') && result.result) {
+      if (
+        (result.tool === "getTonBalance" ||
+          result.tool === "getJettonBalances") &&
+        result.result
+      ) {
         return {
           success: true,
           data: {
             response: `Here are your current balances:`,
-            type: 'balance',
+            type: "balance",
             balances: result.result,
             conversationId: this.generateConversationId(),
             sessionId: this.sessionId,
@@ -430,8 +470,12 @@ class MCPClient {
     return {
       success: true,
       data: {
-        response: `I've executed the requested operations. Here are the results: ${JSON.stringify(results, null, 2)}`,
-        type: 'text',
+        response: `I've executed the requested operations. Here are the results: ${JSON.stringify(
+          results,
+          null,
+          2
+        )}`,
+        type: "text",
         conversationId: this.generateConversationId(),
         sessionId: this.sessionId,
       },
@@ -448,33 +492,35 @@ class MCPClient {
 
   notifyHandlers(event, data) {
     const handlers = this.messageHandlers.get(event) || [];
-    handlers.forEach(handler => {
+    handlers.forEach((handler) => {
       try {
         handler(data);
       } catch (error) {
-        console.error('Error in event handler:', error);
+        console.error("Error in event handler:", error);
       }
     });
   }
 
   handleSSEMessage(type, data) {
-    console.log('SSE message received:', type, data);
+    console.log("SSE message received:", type, data);
     this.notifyHandlers(type, data);
   }
 
   // Utility methods
   generateSessionId() {
-    return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    return (
+      "session_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9)
+    );
   }
 
   generateConversationId() {
-    return 'conv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    return "conv_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
   }
 
   // Cleanup
   disconnect() {
     this.isConnected = false;
-    
+
     if (this.eventSource) {
       this.eventSource.close();
       this.eventSource = null;
@@ -483,9 +529,9 @@ class MCPClient {
     if (this.sessionId) {
       // Clean up session on server
       fetch(`${this.baseUrl}/mcp/${this.sessionId}`, {
-        method: 'DELETE',
-      }).catch(error => {
-        console.error('Error cleaning up session:', error);
+        method: "DELETE",
+      }).catch((error) => {
+        console.error("Error cleaning up session:", error);
       });
     }
   }
